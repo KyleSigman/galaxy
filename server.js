@@ -1,63 +1,18 @@
-// const WebSocket = require('ws');
-// const server = new WebSocket.Server({ port: 8080 });
 
-// const rooms = new Map();
-
-// server.on('connection', (socket) => {
-//   console.log('🟢 Новое подключение');
-
-//   socket.on('message', (data) => {
-//     const msg = JSON.parse(data);
-    
-//     if (msg.type === 'join') {
-//       socket.roomId = msg.roomId;
-//       socket.nick = msg.nick;
-      
-//       if (!rooms.has(msg.roomId)) rooms.set(msg.roomId, []);
-//       rooms.get(msg.roomId).push(socket);
-      
-//       broadcast(msg.roomId, {
-//         type: 'system',
-//         message: `${msg.nick} вошел в чат`
-//       });
-//     }
-    
-//     if (msg.type === 'message') {
-//       broadcast(socket.roomId, {
-//         type: 'message',
-//         nick: socket.nick,
-//         message: msg.message,
-//         time: Date.now()
-//       });
-//     }
-//   });
-
-//   socket.on('close', () => {
-//     if (socket.roomId && rooms.has(socket.roomId)) {
-//       broadcast(socket.roomId, {
-//         type: 'system',
-//         message: `${socket.nick} покинул чат`
-//       });
-      
-//       const roomSockets = rooms.get(socket.roomId);
-//       const index = roomSockets.indexOf(socket);
-//       if (index > -1) roomSockets.splice(index, 1);
-//     }
-//   });
-// });
-
-// function broadcast(roomId, data) {
-//   if (!rooms.has(roomId)) return;
-//   rooms.get(roomId).forEach(socket => {
-//     socket.send(JSON.stringify(data));
-//   });
-// }
-
-// console.log('🔵 WebSocket сервер на ws://localhost:8080');
+const express = require('express');
+const path = require('path');
+const app = express();
+app.use(express.static(path.join(__dirname, 'build')));
 
 
 const WebSocket = require('ws');
-const server = new WebSocket.Server({ port: 8080 });
+const httpServer = require('http').createServer(app);
+const server = new WebSocket.Server({ server: httpServer });
+
+httpServer.listen(8080, () => {
+  console.log('🚀 Сервер на http://localhost:8080');
+});
+// const server = new WebSocket.Server({ port: 8080 });
 
 const rooms = new Map(); // roomId -> { sockets, author, mode, allowedUsers }
 
