@@ -16,7 +16,7 @@ const GalaxyChat = () => {
 
   // Подключение к WebSocket
   const connect = (room) => {
-    const socket = new WebSocket('ws://localhost:8080');
+    const socket = new WebSocket(`${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}`);
     
     socket.onopen = () => {
       socket.send(JSON.stringify({
