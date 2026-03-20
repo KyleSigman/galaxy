@@ -1,0 +1,470 @@
+@import './variables.scss';
+@font-face {
+  font-family: "Matricha";
+  src: local("Matricha"),
+    url("../fonts/matricha.ttf") format("truetype");
+}
+
+.galactic-market {
+  position: absolute;
+  width: 100%;
+  min-height: 100%;
+  background: $dark-bg;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+.SkyBoxM {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.2;
+}
+
+.market-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 40px;
+
+  h1 {
+    color: $neon-pink;
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    text-shadow: 0 0 20px $neon-pink;
+    margin: 0 0 10px;
+    animation: glitch 3s infinite;
+  }
+
+  p {
+    color: $neon-blue;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px $neon-blue;
+    margin: 0;
+  }
+}
+
+.market-container {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.terminal-form {
+  background: rgba(10,10,15,0.8);
+  // backdrop-filter: blur(10px);
+  border: 2px solid $neon-purple;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(179,0,255,0.3);
+  height: fit-content;
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(0,0,0,0.5);
+  border-bottom: 2px solid $neon-pink;
+
+  .terminal-title {
+    color: $neon-pink;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px $neon-pink;
+  }
+
+  .terminal-status {
+    color: $neon-green;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border: 1px solid $neon-green;
+    border-radius: 4px;
+    animation: pulse 2s infinite;
+  }
+}
+
+form {
+  padding: 25px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    color: $neon-blue;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 5px $neon-blue;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid $neon-purple;
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: white;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $neon-pink;
+      box-shadow: 0 0 20px $neon-pink;
+    }
+
+    &::placeholder {
+      color: rgba(255,255,255,0.2);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.file-input {
+  position: relative;
+  height: 50px;
+  background: rgba(0,0,0,0.6);
+  border: 2px dashed $neon-purple;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: $neon-blue;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: $neon-pink;
+    box-shadow: 0 0 15px $neon-pink;
+
+    span {
+      color: $neon-pink;
+    }
+  }
+}
+
+.preview-card {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid $neon-green;
+  border-radius: 12px;
+  margin-bottom: 20px;
+
+  .preview-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid $neon-green;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .preview-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .preview-title {
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .preview-price {
+      color: $neon-green;
+      font-size: 14px;
+      text-shadow: 0 0 5px $neon-green;
+    }
+  }
+}
+
+.submit-btn {
+  width: 100%;
+  height: 55px;
+  background: transparent;
+  border: 2px solid $neon-pink;
+  border-radius: 8px;
+  color: $neon-pink;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: $neon-pink;
+    color: $dark-bg;
+    box-shadow: 0 0 30px $neon-pink;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: gray;
+  }
+}
+
+.products-grid {
+  h2 {
+    color: $neon-blue;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px $neon-blue;
+    margin: 0 0 20px;
+  }
+}
+
+.products-list {
+  display: grid;
+  gap: 20px;
+}
+
+.product-card {
+  background: rgba(10,10,15,0.8);
+  // backdrop-filter: blur(10px);
+  border: 2px solid $neon-blue;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    border-color: $neon-pink;
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 30px $neon-pink;
+  }
+}
+
+.product-rarity {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  border: 2px solid $neon-green;
+  border-radius: 20px;
+  padding: 4px 12px;
+  color: $neon-green;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 2;
+  // backdrop-filter: blur(5px);
+}
+
+.product-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  border-bottom: 2px solid $neon-purple;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+  }
+
+  .product-card:hover & img {
+    transform: scale(1.1);
+  }
+}
+
+.product-content {
+  padding: 20px;
+
+  h3 {
+    color: white;
+    font-size: 18px;
+    margin: 0 0 10px;
+    text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  }
+
+  p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 15px;
+  }
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 2px dashed $neon-purple;
+
+  .product-price {
+    color: $neon-green;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px $neon-green;
+  }
+
+  .product-seller {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $neon-blue;
+    font-size: 14px;
+
+    img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid $neon-blue;
+    }
+  }
+}
+
+.market-home {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: $neon-pink;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px $neon-pink;
+  transition: all 0.3s ease;
+  z-index: 10;
+
+  &:hover {
+    background: $neon-blue;
+    box-shadow: 0 0 30px $neon-blue;
+    transform: scale(1.1);
+  }
+
+  img {
+    width: 28px;
+    height: 28px;
+    filter: invert(1);
+    transition: all 0.3s ease;
+  }
+
+  &:hover img {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes glitch {
+  2%, 64% { transform: translate(2px,0) skew(0deg); }
+  4%, 60% { transform: translate(-2px,0) skew(0deg); }
+  62% { transform: translate(0,0) skew(5deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 1024px) {
+  .market-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .market-header h1 {
+    font-size: 28px;
+    letter-spacing: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .galactic-market {
+    padding: 10px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .product-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

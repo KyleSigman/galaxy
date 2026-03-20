@@ -1,0 +1,759 @@
+// Profile.scss
+
+// Кибер-неоновые переменные
+$neon-pink: #ff00ff;
+$neon-blue: #00ffff;
+$neon-purple: #b300ff;
+$neon-green: #00ff9d;
+$neon-yellow: #ffff00;
+$neon-orange: #ff9580;
+$dark-bg: #0a0a0f;
+$darker-bg: #050507;
+$glass-bg: rgba(10, 10, 15, 0.7);
+$glass-border: rgba(255, 0, 255, 0.3);
+
+// Анимации
+@keyframes neonPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px $neon-pink) drop-shadow(0 0 10px $neon-pink);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px $neon-blue) drop-shadow(0 0 25px $neon-blue);
+  }
+}
+
+@keyframes neonBorder {
+  0%, 100% {
+    border-color: $neon-pink;
+    box-shadow: 0 0 10px $neon-pink;
+  }
+  50% {
+    border-color: $neon-blue;
+    box-shadow: 0 0 20px $neon-blue;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes glitch {
+  2%, 64% {
+    transform: translate(2px, 0) skew(0deg);
+  }
+  4%, 60% {
+    transform: translate(-2px, 0) skew(0deg);
+  }
+  62% {
+    transform: translate(0, 0) skew(5deg);
+  }
+}
+
+.Human {
+  position: relative;
+  background: $dark-bg;
+  color: #fff;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  width: 100% !important;
+  max-width: 100vw !important;  
+  // Сканирующая линия
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  // Шумовая текстура
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,255,255,0.05) 1px, transparent 2px);
+    pointer-events: none;
+    z-index: 9998;
+  }
+}
+
+#prflbl {
+  position: relative;
+  display: inline-block;
+  padding: 5px 15px;
+  margin: 10px 0 20px 20px;
+  background: $neon-pink;
+  color: $dark-bg;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: $neon-blue;
+    animation: neonPulse 1s infinite;
+  }
+}
+
+.nerualBlock {
+  position: relative;
+  background: $glass-bg;
+  backdrop-filter: blur(10px);
+  border: 1px solid $neon-pink;
+  border-radius: 20px;
+  margin: 20px;
+  padding: 20px;
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+  overflow: hidden;
+  
+  &.active {
+    border-color: $neon-blue;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+    animation: neonBorder 2s infinite;
+  }
+  
+  // Глитч эффект при наведении
+  &:hover {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 0, 255, 0.1), transparent);
+      animation: glitch 0.3s infinite;
+      pointer-events: none;
+    }
+  }
+}
+
+.horizontal {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 20px;
+  position: relative;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.profilecover {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid $neon-pink;
+  box-shadow: 0 0 30px $neon-pink,
+              inset 0 0 20px rgba(255, 0, 255, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: $neon-blue;
+    box-shadow: 0 0 40px $neon-blue,
+                inset 0 0 30px rgba(0, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
+  
+  // Вращающийся ободок
+  &::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid transparent;
+    border-top-color: $neon-green;
+    border-bottom-color: $neon-purple;
+    border-radius: 50%;
+    animation: rotate 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.profileimg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.rightblock {
+  flex: 1;
+  position: relative;
+}
+
+.ProfileName {
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: linear-gradient(45deg, $neon-pink, $neon-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  
+  &.VIP {
+    background: linear-gradient(45deg, gold, $neon-pink);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px gold);
+  }
+  
+  &::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    top: 0;
+    color: $neon-pink;
+    opacity: 0.5;
+    clip-path: inset(0 0 0 0);
+    animation: glitch 3s infinite;
+  }
+  
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    left: -2px;
+    top: 0;
+    color: $neon-blue;
+    opacity: 0.5;
+    clip-path: inset(0 0 0 0);
+    animation: glitch 2s infinite reverse;
+  }
+}
+
+.artistclass {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(255, 0, 255, 0.1);
+  border-left: 3px solid $neon-pink;
+  border-radius: 0 10px 10px 0;
+  
+  &:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-left-color: $neon-blue;
+  }
+}
+
+#lbl {
+  display: inline-block;
+  margin: 20px 0 10px 20px;
+  padding: 3px 10px;
+  background: $neon-purple;
+  color: $dark-bg;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transform: skew(-10deg);
+}
+
+.nerualData {
+  position: relative;
+  min-height: 100px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 15px;
+  border: 1px solid rgba(255, 0, 255, 0.3);
+}
+
+.Admin {
+  .todo_container {
+    display: grid;
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: $darker-bg;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: $neon-pink;
+      border-radius: 5px;
+      
+      &:hover {
+        background: $neon-blue;
+      }
+    }
+    
+    // Стили для каждого Todo элемента
+    .todo-item {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid $neon-blue;
+      border-radius: 10px;
+      padding: 15px;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 0, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+      }
+      
+      &:hover {
+        border-color: $neon-pink;
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        transform: translateY(-2px) scale(1.02);
+      }
+      
+      .todo-title {
+        color: $neon-green;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        text-shadow: 0 0 5px $neon-green;
+      }
+      
+      .todo-content {
+        color: #fff;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      
+      .todo-date {
+        color: $neon-purple;
+        font-size: 0.8rem;
+        margin-top: 10px;
+        text-align: right;
+        font-family: 'Digital', monospace;
+      }
+    }
+  }
+}
+
+// Profile.scss - добавить в конец файла
+
+
+// @keyframes terminalPulse {
+
+//   0%, 100% {
+//     box-shadow: 0 0 30px rgba(255, 0, 255, 0.5),
+//                 inset 0 0 20px rgba(255, 0, 255, 0.2);
+//   }
+//   50% {
+//     box-shadow: 0 0 50px rgba(0, 255, 255, 0.6),
+//                 inset 0 0 30px rgba(0, 255, 255, 0.3);
+//   }
+// }
+
+@keyframes borderRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+.terminal-suggestions {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid $neon-purple;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 5px;
+  padding: 10px;
+  backdrop-filter: blur(10px);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10001;
+  
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $darker-bg;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $neon-pink;
+    border-radius: 5px;
+  }
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  margin: 2px 0;
+  color: $neon-blue;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 0, 255, 0.1);
+    border-left-color: $neon-pink;
+    color: $neon-pink;
+    transform: translateX(5px);
+  }
+  
+  .command-name {
+    color: $neon-green;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .command-desc {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+  }
+}
+
+.terminal-history {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid $neon-blue;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 10px;
+  padding: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.history-item {
+  color: $neon-purple;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 0, 255, 0.1);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .history-command {
+    color: $neon-green;
+    margin-right: 10px;
+  }
+  
+  .history-result {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.terminal-status {
+  position: absolute;
+  top: -25px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 3px 10px;
+  border-radius: 5px 5px 0 0;
+  border: 1px solid $neon-pink;
+  border-bottom: none;
+  color: $neon-green;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  
+  &::before {
+    content: '⚡';
+    margin-right: 5px;
+    color: $neon-yellow;
+  }
+}
+
+// Анимация курсора
+@keyframes cursorBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+// Успешный ввод команды
+.terminal-success {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $neon-green;
+  color: $dark-bg;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  animation: fadeOut 2s forwards;
+  white-space: nowrap;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+// Ошибка
+.terminal-error {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $neon-pink;
+  color: $dark-bg;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  animation: fadeOut 2s forwards;
+  white-space: nowrap;
+}
+
+
+// Profile.scss - добавить в конец
+
+.message-icon {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(10,10,15,0.8);
+  border: 2px solid $neon-purple;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+
+  &:hover {
+    border-color: $neon-pink;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px $neon-pink;
+  }
+
+  &.has-unread {
+    border-color: $neon-orange;  // если есть переменная
+    animation: pulse 1.5s infinite;
+  }
+}
+
+.unread-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  background: $neon-orange;
+  border-radius: 50%;
+  color: $dark-bg;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 1s infinite;
+}
+
+// @keyframes pulse {
+//   0%, 100% {
+//     box-shadow: 0 0 5px $neon-orange;
+//   }
+//   50% {
+//     box-shadow: 0 0 15px $neon-orange;
+//   }
+// }
+
+// @keyframes shine {
+//   0% {
+//     transform: rotate(45deg) translateX(-100%);
+//   }
+//   20%, 100% {
+//     transform: rotate(45deg) translateX(100%);
+//   }
+// }
+
+
+.upload-interface {
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid $neon-blue;
+  border-radius: 10px;
+}
+
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+
+  .progress-bar {
+    flex: 1;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid $neon-purple;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, $neon-pink, $neon-blue);
+      transition: width 0.3s ease;
+    }
+  }
+
+  .progress-text {
+    color: $neon-green;
+    font-size: 14px;
+    min-width: 50px;
+  }
+}
+
+.upload-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+
+  .upload-btn, .publish-btn, .cancel-btn {
+    padding: 8px 15px;
+    background: transparent;
+    border: 2px solid;
+    border-radius: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .upload-btn {
+    border-color: $neon-blue;
+    color: $neon-blue;
+    &:hover {
+      background: $neon-blue;
+      color: $dark-bg;
+    }
+  }
+
+  .publish-btn {
+    border-color: $neon-green;
+    color: $neon-green;
+    &:hover:not(:disabled) {
+      background: $neon-green;
+      color: $dark-bg;
+    }
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .cancel-btn {
+    border-color: $neon-pink;
+    color: $neon-pink;
+    &:hover {
+      background: $neon-pink;
+      color: $dark-bg;
+    }
+  }
+
+  .file-name {
+    color: white;
+    font-size: 14px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+
+// Адаптивность
+@media (max-width: 768px) {
+  .ProfileName {
+    font-size: 1.8rem;
+  }
+  
+  .profilecover {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .nerualBlock {
+    margin: 10px;
+    padding: 15px;
+  }
+}
+
+
+
+
+// Добавляем цифровой шрифт
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');

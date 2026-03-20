@@ -1,0 +1,610 @@
+@import './variables.scss';
+
+@font-face {
+  font-family: "Matricha";
+  src: local("Matricha"),
+    url("../fonts/matricha.ttf") format("truetype");
+}
+
+.register-wizard {
+  position: absolute;
+  width: 100%;
+  min-height: 100%;
+  background: $dark-bg;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+.wizard-container {
+  max-width: 600px;
+  margin: 40px auto;
+  // background: rgba(10, 10, 15, 0.493);
+  background: rgba(10, 10, 15, 0.462);
+  // backdrop-filter: blur(3px);
+  border: 2px solid $neon-blue;
+  border-radius: 30px;
+  padding: 30px;
+  box-shadow: 0 0 50px rgba(0, 255, 255, 0.474);
+  position: relative;
+  z-index: 2;
+}
+
+.wizard-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $neon-pink;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 0 15px $neon-pink;
+    margin: 0 0 20px;
+    animation: glitch 3s infinite;
+  }
+}
+
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 5px;  // уменьшили отступ
+  margin-bottom: 10px;
+  flex-wrap: wrap;  // чтобы переносились если не влезают
+}
+
+.step-dot {
+  width: 25px;
+  height: 25px;
+  border: 2px solid $neon-purple;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: $neon-purple;
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  &.active {
+    border-color: $neon-pink;
+    box-shadow: 0 0 20px $neon-pink;
+    
+    &::before {
+      background: $neon-pink;
+      opacity: 1;
+    }
+  }
+
+  &.completed {
+    border-color: $neon-green;
+    
+    &::before {
+      background: $neon-green;
+      opacity: 1;
+    }
+  }
+}
+
+.step-count {
+  color: $neon-green;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.wizard-content {
+  min-height: 400px;
+}
+
+// Общие стили для шагов
+h2, h3 {
+  color: $neon-blue;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px $neon-blue;
+}
+
+p {
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+
+.neon-input {
+  width: 90%;
+  height: 50px;
+  background: rgba(0,0,0,0.6);
+  border: 2px solid $neon-purple;
+  border-radius: 10px;
+  padding: 0 15px;
+  color: $neon-green;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  // font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $neon-pink;
+    box-shadow: 0 0 20px $neon-pink;
+  }
+}
+
+.btn-next {
+  width: 100%;
+  height: 50px;
+  background: transparent;
+  border: 2px solid $neon-green;
+  border-radius: 10px;
+  color: $neon-green;
+
+  font-size: 16px;
+  // text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: $neon-green;
+    color: $dark-bg;
+    box-shadow: 0 0 30px $neon-green;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.error-message {
+  color: $neon-pink;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 5px $neon-pink;
+}
+
+// Шаг приветствия
+.step-welcome {
+  text-align: center;
+  padding: 40px 0;
+
+  h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+  }
+
+  p {
+    font-size: 18px;
+    margin-bottom: 40px;
+  }
+}
+
+// Инструменты
+.instruments-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.instrument-btn {
+  padding: 15px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid $neon-purple;
+  border-radius: 10px;
+  color: white;
+
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+
+  &:hover {
+    border-color: $neon-blue;
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px $neon-blue;
+  }
+
+  &.active {
+    border-color: $neon-pink;
+    background: rgba(255,0,255,0.1);
+    box-shadow: 0 0 20px $neon-pink;
+  }
+}
+
+// Стили
+.styles-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+
+  input {
+    flex: 1;
+    height: 45px;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid $neon-purple;
+    border-radius: 8px;
+    padding: 0 15px;
+    color: $neon-green;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  button {
+    width: 45px;
+    height: 45px;
+    background: transparent;
+    border: 2px solid $neon-green;
+    border-radius: 8px;
+    color: $neon-green;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $neon-green;
+      color: $dark-bg;
+    }
+  }
+}
+
+.styles-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  min-height: 50px;
+}
+
+.style-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  background: rgba(0,255,0,0.1);
+  border: 2px solid $neon-green;
+  border-radius: 30px;
+  color: $neon-green;
+  font-size: 14px;
+
+  button {
+    background: none;
+    border: none;
+    color: $neon-pink;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 5px;
+
+    &:hover {
+      text-shadow: 0 0 10px $neon-pink;
+    }
+  }
+}
+
+.style-select {
+  width: 100%;
+  height: 45px;
+  background: rgba(0,0,0,0.6);
+  border: 2px solid $neon-purple;
+  border-radius: 8px;
+  padding: 0 15px;
+  color: $neon-green;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  // font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 25px;
+  cursor: pointer;
+
+  option {
+    background: $dark-bg;
+  }
+}
+
+// Аватар
+.avatar-upload {
+  margin-bottom: 20px;
+
+  input {
+    display: none;
+  }
+
+  .upload-btn {
+    display: block;
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: 2px solid $neon-blue;
+    border-radius: 10px;
+    color: $neon-blue;
+
+    font-size: 16px;
+    // text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $neon-blue;
+      color: $dark-bg;
+      box-shadow: 0 0 30px $neon-blue;
+    }
+  }
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid $neon-purple;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $neon-pink, $neon-blue);
+  transition: width 0.3s ease;
+}
+
+.avatar-preview {
+  margin-top: 20px;
+  text-align: center;
+
+  img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid $neon-green;
+    box-shadow: 0 0 20px $neon-green;
+    object-fit: cover;
+  }
+}
+
+// Ключ
+.generate-btn {
+  width: 100%;
+  height: 60px;
+  background: transparent;
+  border: 2px solid $neon-pink;
+  border-radius: 10px;
+  color: $neon-pink;
+
+  font-size: 20px;
+  // text-transform: uppercase;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 25px;
+
+  &:hover {
+    background: $neon-pink;
+    color: $dark-bg;
+    box-shadow: 0 0 40px $neon-pink;
+  }
+}
+
+.key-display {
+  text-align: center;
+  font-size: 48px;
+  color: $neon-green;
+  text-shadow: 0 0 20px $neon-green;
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(0,0,0,0.3);
+  border: 2px dashed $neon-green;
+  border-radius: 10px;
+}
+
+.visual-key {
+  display: block;
+  width: 200px;
+  height: 200px;
+  margin: 20px auto;
+  border: 2px solid $neon-purple;
+  border-radius: 20px;
+}
+
+.key-warning {
+  color: $neon-pink;
+  text-align: center;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 20px;
+}
+
+// Финал
+.step-final {
+  text-align: center;
+}
+
+.profile-card {
+  background: rgba(0,0,0,0.4);
+  border: 2px solid $neon-blue;
+  border-radius: 20px;
+  padding: 25px;
+  margin: 20px 0;
+
+  .final-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid $neon-green;
+    box-shadow: 0 0 20px $neon-green;
+    margin-bottom: 20px;
+    object-fit: cover;
+  }
+
+  .final-info {
+    text-align: left;
+
+    p {
+      margin: 10px 0;
+      color: white;
+      font-size: 16px;
+    }
+
+    .label {
+      color: $neon-purple;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-right: 10px;
+    }
+  }
+}
+
+.btn-enter {
+  width: 100%;
+  height: 60px;
+  background: $neon-green;
+  border: none;
+  border-radius: 10px;
+  color: $dark-bg;
+
+  font-size: 20px;
+  font-weight: bold;
+  // text-transform: uppercase;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: $neon-pink;
+    box-shadow: 0 0 40px $neon-pink;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Анимации
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes glitch {
+  2%, 64% { transform: translate(2px,0) skew(0deg); }
+  4%, 60% { transform: translate(-2px,0) skew(0deg); }
+  62% { transform: translate(0,0) skew(5deg); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 10px $neon-blue;
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 30px $neon-blue;
+  }
+}
+
+@media (max-width: 768px) {
+  .wizard-container {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+
+  .instruments-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .key-display {
+    font-size: 32px;
+  }
+}
+
+
+.instrument-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid $neon-purple;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  
+    input {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      accent-color: $neon-pink;
+      cursor: pointer;
+    }
+  
+    span {
+      color: white;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+  
+    &:has(input:checked) {
+      border-color: $neon-pink;
+      background: rgba(255,0,255,0.1);
+      box-shadow: 0 0 20px $neon-pink;
+    }
+  
+    &:hover {
+      border-color: $neon-blue;
+    }
+  }
+
+  .key-actions {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .btn-download {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid $neon-blue;
+    border-radius: 8px;
+    color: $neon-blue;
+
+    font-size: 12px;
+    // text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  
+    &:hover {
+      background: $neon-blue;
+      color: $dark-bg;
+      box-shadow: 0 0 20px $neon-blue;
+    }
+  }

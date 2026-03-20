@@ -1,0 +1,248 @@
+@import './variables.scss';
+
+.login-container {
+  position: absolute;
+  width: 100%;
+  min-height: 100%;
+  background: $dark-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Share Tech Mono', monospace;
+
+  form 
+{
+  background: none;
+  filter: none;
+  padding: 0;
+  margin: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-pink, transparent);
+    animation: scanline 2s linear infinite;
+
+    display: none;
+  }
+  
+}
+input 
+{
+  backdrop-filter: none;
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid $neon-pink;
+  background-color: transparent;
+  background: transparent;
+
+  .terminal-title {
+    color: $neon-pink;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px $neon-pink;
+  }
+
+  .terminal-status {
+    color: $neon-green;
+    font-size: 14px;
+    padding: 4px 12px;
+    border: 2px solid $neon-green;
+    border-radius: 20px;
+    animation: pulse 2s infinite;
+  }
+}
+}
+
+.terminal-login {
+  width: 90%;
+  max-width: 500px;
+  background: rgba(10, 10, 15, 0.405);
+  border: 2px solid $neon-blue;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 0 50px rgba(0,255,255,0.3);
+  position: relative;
+  z-index: 2;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-pink, transparent);
+    animation: scanline 2s linear infinite;
+  }
+}
+
+
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+  width: 100%;
+background-color: rgba(0, 255, 255, 0);
+
+  input {
+    min-width: 100%; height: 60px;
+    box-sizing: border-box;
+    background: rgba(254, 0, 0, 0);
+    border: 2px solid $neon-purple;
+    border-radius: 10px;
+    padding: 0;
+    color: $neon-green;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 24px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    padding-left: 20px;
+
+    &:focus {
+      outline: none;
+      border-color: $neon-pink;
+      box-shadow: 0 0 30px $neon-pink;
+    }
+
+    &::placeholder {
+      color: rgba(255,255,255,0.2);
+      font-size: 16px;
+      letter-spacing: normal;
+    }
+  }
+}
+
+.error-message {
+  color: $neon-pink;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 2px dashed $neon-pink;
+  border-radius: 8px;
+  animation: glitch 0.3s infinite;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 50px;
+  background: transparent;
+  border: 2px solid $neon-green;
+  border-radius: 10px;
+  color: $neon-green;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+
+  &:hover:not(:disabled) {
+    background: $neon-green;
+    color: $dark-bg;
+    box-shadow: 0 0 30px $neon-green;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.terminal-footer {
+  text-align: center;
+  color: $neon-purple;
+  font-size: 14px;
+
+  span {
+    display: block;
+    margin-bottom: 10px;
+  }
+}
+
+.register-link {
+  color: $neon-blue;
+  text-decoration: none;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: $neon-pink;
+    text-shadow: 0 0 10px $neon-pink;
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+
+.divider {
+  text-align: center;
+  color: $neon-purple;
+  margin: 15px 0;
+  position: relative;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: $neon-purple;
+  }
+  
+  &::before { left: 0; }
+  &::after { right: 0; }
+}
+
+.alternative-login {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.alt-btn {
+  flex: 1;
+  height: 40px;
+  background: transparent;
+  border: 2px solid $neon-blue;
+  border-radius: 8px;
+  color: $neon-blue;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0 15px $neon-blue;
+  }
+}
+
+

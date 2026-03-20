@@ -1,0 +1,347 @@
+@import './variables.scss';
+
+.Finder {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  // background: $dark-bg;
+  overflow-y: auto;
+  font-family: 'Share Tech Mono', monospace;
+
+  .SkyBoxF {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+.Regaliascontent {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.regaliacontent {
+  background: rgba(1, 1, 30, 0.423);
+  backdrop-filter: blur(1px);
+  border: 2px solid $neon-blue;
+  border-radius: 16px;
+  padding: 16px;
+  animation: cardAppear 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    border-color: $neon-pink;
+    box-shadow: 0 0 30px $neon-pink;
+  }
+}
+
+.imgshell {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid $neon-green;
+  box-shadow: 0 0 15px $neon-green;
+  z-index: 2;
+
+  .vocimg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+  }
+
+  &:hover .vocimg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px $neon-pink);
+  }
+}
+
+.regalia {
+  margin-top: 0;
+  padding-right: 0px;
+
+  a {
+    text-decoration: none;
+    display: block;
+  }
+}
+
+.inset {
+
+  border: 1px dashed rgba(167, 74, 255, 0.793);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  // backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $neon-blue;
+    transform: translateX(5px);
+    box-shadow: 0 0 15px $neon-blue;
+  }
+
+}
+
+.ready.inset {
+  border-left: 3px solid $neon-green;
+  color: $neon-green;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  h2 {
+    color: $neon-green;
+  }
+}
+
+form {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  // background: linear-gradient(180deg, rgba(0, 0, 0, 0.423), transparent);
+
+  input {
+    width: 100%;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid $neon-pink;
+    border-radius: 8px;
+    padding-left: 20px;
+    box-sizing: border-box;
+    color: $neon-green;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    // backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3),
+                inset 0 0 10px rgba(255, 0, 255, 0.2);
+    transition: all 0.3s ease;
+    caret-color: transparent; 
+    &::placeholder {
+      color: rgba(0, 255, 255, 0.3);
+      font-style: italic;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $neon-blue;
+      box-shadow: 0 0 30px $neon-blue,
+                  inset 0 0 15px $neon-blue;
+    }
+  }
+
+  // Добавляем символ ">" как в терминале
+  &::before {
+    content: '>';
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $neon-green;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px $neon-green;
+    z-index: 3;
+    animation: cursorBlink 1s infinite;
+  }
+}
+
+.radio {
+  position: relative;
+  z-index: 2;
+  padding: 0 16px 1px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px; max-width: 100px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid $neon-purple;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+
+    &:hover {
+      border-color: $neon-blue;
+      transform: translateZ(5px);
+      box-shadow: 0 0 10px $neon-blue;;
+    }
+
+    input {
+      position: absolute;
+      opacity: 0;
+
+      &:checked + img,
+      &:checked ~ img {
+        filter: invert(1) drop-shadow(0 0 15px $neon-pink);
+        animation: iconPulse 1s infinite;
+      }
+    }
+  }
+}
+
+.finderhome {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 3;
+  width: 56px;
+  height: 56px;
+  background: $neon-pink;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px $neon-pink;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: $neon-blue;
+    box-shadow: 0 0 30px $neon-blue;
+    transform: scale(1.1);
+  }
+
+  img {
+    width: 28px;
+    height: 28px;
+    filter: invert(1);
+    transition: all 0.3s ease;
+  }
+
+  &:hover img {
+    transform: rotate(360deg);
+  }
+}
+
+// @keyframes cursorBlink {
+//   0%, 100% { opacity: 1; }
+//   50% { opacity: 0; }
+// }
+// @keyframes scanline {
+//   0% { transform: translateY(-100%); }
+//   100% { transform: translateY(100%); }
+// }
+
+// @keyframes cardAppear {
+//   from {
+//     opacity: 0;
+//     transform: translateY(20px);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }
+
+// @keyframes iconPulse {
+//   0%, 100% { filter: invert(1) drop-shadow(0 0 10px $neon-pink); }
+//   50% { filter: invert(1) drop-shadow(0 0 20px $neon-blue); }
+// }
+
+@media (min-width: 1024px) {
+  .radio {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .Regaliascontent {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 24px;
+  }
+
+  form {
+    padding: 20px 24px;
+
+    input {
+      max-width: 400px;
+    }
+  }
+
+  .radio {
+    padding: 0 24px 20px;
+  }
+}
+
+.regaliatittle.inset,
+.regaliaexp.inset,
+.regaliastyle.inset,
+.regaliaactualband.inset,
+.regaliabands.inset,
+.regaliasupport.inset,
+.regprice.inset,
+.regfavband.inset,
+.regmessage.inset,
+.nick.inset,
+.regtext.inset,
+.regstate.inset {
+  h2 {
+    color: $neon-blue;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 4px 0;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 5px $neon-blue;
+  }
+
+  // Само значение (drums, 11, Nu metal и т.д.)
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+// Для особо важных полей можно сделать ярче
+.regaliatittle.inset,
+.regaliastyle.inset {
+  color: $neon-pink;
+  text-shadow: 0 0 10px $neon-pink;
+  font-weight: bold;
+}
+
+.ready.inset {
+  color: $neon-green;
+  text-shadow: 0 0 10px $neon-green;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.nick 
+{
+  padding: 20px;
+}
+

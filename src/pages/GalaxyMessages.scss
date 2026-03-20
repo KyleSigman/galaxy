@@ -1,0 +1,220 @@
+@import './variables.scss';
+
+.galaxy-messages {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  max-height: 400px;
+  background: rgba(10,10,15,0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid $neon-orange;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 30px $neon-orange;
+  z-index: 1000;
+  font-family: 'Share Tech Mono', monospace;
+  animation: slideUp 0.3s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-pink, transparent);
+    animation: scanline 2s linear infinite;
+  }
+}
+
+.messages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(0,0,0,0.5);
+  border-bottom: 2px solid $neon-pink;
+
+  h3 {
+    color: $neon-green;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 0 0 5px $neon-green;
+  }
+}
+
+.unread-badge {
+  padding: 4px 8px;
+  background: $neon-pink;
+  border-radius: 20px;
+  color: $dark-bg;
+  font-size: 12px;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
+
+.messages-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  padding-bottom: 100px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $neon-purple;
+    border-radius: 4px;
+  }
+}
+
+.message-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid $neon-purple;
+  border-radius: 8px;
+  animation: messageAppear 0.3s ease;
+
+  &:hover {
+    border-color: $neon-pink;
+    transform: translateX(5px);
+  }
+}
+
+.from {
+  color: $neon-green;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 0 5px $neon-green;
+  margin-right: 8px;
+}
+
+.text {
+  color: white;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.time {
+  display: block;
+  color: $neon-purple;
+  font-size: 9px;
+  text-transform: uppercase;
+  margin-top: 5px;
+  text-align: right;
+}
+
+.message-item {
+  position: relative;
+  padding-right: 30px; // место для кнопки
+}
+
+.delete-message {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid $neon-pink;
+  border-radius: 50%;
+  color: $neon-pink;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: all 0.3s ease;
+
+  .message-item:hover & {
+    opacity: 1;
+  }
+
+  &:hover {
+    background: $neon-pink;
+    color: $dark-bg;
+    transform: scale(1.1);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid $neon-pink;
+  border-radius: 50%;
+  color: $neon-pink;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: all 0.3s ease;
+
+  .message-item:hover & {
+    opacity: 1;
+  }
+
+  &:hover {
+    background: $neon-pink;
+    color: $dark-bg;
+    transform: scale(1.1);
+  }
+}
+
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px $neon-pink;
+  }
+  50% {
+    box-shadow: 0 0 20px $neon-pink;
+  }
+}
+
+@keyframes messageAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .galaxy-messages {
+    width: auto;
+  }
+}
