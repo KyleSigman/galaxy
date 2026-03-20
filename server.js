@@ -1,12 +1,18 @@
+
 const express = require('express');
 const path = require('path');
 const app = express();
 app.use(express.static(path.join(__dirname, 'build')));
 
-
 const WebSocket = require('ws');
-const port = process.env.PORT || 8080;
-const server = new WebSocket.Server({ port });
+const httpServer = require('http').createServer(app);
+const server = new WebSocket.Server({ server: httpServer });
+
+httpServer.listen(8080, () => {
+  console.log('🚀 Сервер на http://localhost:8080');
+});
+// const server = new WebSocket.Server({ port: 8080 });
+
 
 const rooms = new Map(); // roomId -> { sockets, author, mode, allowedUsers }
 
