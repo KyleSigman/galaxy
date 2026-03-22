@@ -9,9 +9,14 @@ const WebSocket = require('ws');
 const httpServer = require('http').createServer(app);
 const server = new WebSocket.Server({ server: httpServer });
 
-httpServer.listen(8080, () => {
-  console.log('🚀 Сервер на http://localhost:8080');
+const PORT = process.env.PORT || 8080;
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Сервер на порту ${PORT}`);
 });
+
+// httpServer.listen(8080, () => {
+//   console.log('🚀 Сервер на http://localhost:8080');
+// });
 // const server = new WebSocket.Server({ port: 8080 });
 
 const rooms = new Map(); // roomId -> { sockets, author, mode, allowedUsers }
