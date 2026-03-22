@@ -1,0 +1,480 @@
+@import '../pages/variables.scss';
+
+@font-face {
+    font-family: "Matricha";
+    src: local("Matricha"),
+      url("../fonts/matricha.ttf") format("truetype");
+  }
+
+// Общие стили карточки
+.artcard {
+  max-width: 600px;
+  margin: 20px auto;
+//   background: rgba(10, 10, 15, 0.244);
+//   backdrop-filter: blur(10px);
+  border-radius: 32px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    pointer-events: none;
+  }
+}
+
+// Миксин для создания фона с шахматным порядком эмодзи
+// Фоны — шахматный порядок, один тип эмодзи (убрал вторые эмодзи)
+// @mixin chessboard-bg($emoji, $size: 72px, $opacity: 0.12) {
+//     $cell-size: $size;
+//     $pattern-size: $cell-size * 2;
+//     $font-size: $cell-size * 0.7;
+//     $y-offset: $cell-size * 0.28;
+    
+//     background-color: transparent;
+//     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 #{$pattern-size} #{$pattern-size}'%3E%3Crect width='#{$pattern-size}' height='#{$pattern-size}' fill='transparent'/%3E%3Ctext x='#{$cell-size / 2}' y='#{$cell-size / 2 + $y-offset}' font-size='#{$font-size}' text-anchor='middle' dominant-baseline='middle' fill='white' opacity='#{$opacity}' style='filter: grayscale(1);'%3E#{$emoji}%3C/text%3E%3Ctext x='#{$cell-size + $cell-size / 2}' y='#{$cell-size + $cell-size / 2 + $y-offset}' font-size='#{$font-size}' text-anchor='middle' dominant-baseline='middle' fill='white' opacity='#{$opacity}' style='filter: grayscale(1);'%3E#{$emoji}%3C/text%3E%3C/svg%3E");
+//     background-repeat: repeat;
+//     background-size: #{$pattern-size} #{$pattern-size};
+// }
+@mixin chessboard-bg($emoji, $size: 72px, $opacity: 0.12) {
+    background-color: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 #{$size * 2} #{$size * 2}'%3E%3Crect width='#{$size * 2}' height='#{$size * 2}' fill='transparent'/%3E%3Ctext x='#{$size / 2}' y='#{$size / 2 + $size * 0.28}' font-size='#{$size * 0.7}' text-anchor='middle' dominant-baseline='middle' fill='white' opacity='#{$opacity}' style='filter: grayscale(1);'%3E#{$emoji}%3C/text%3E%3Ctext x='#{$size + $size / 2}' y='#{$size / 2 + $size * 0.28}' font-size='#{$size * 0.7}' text-anchor='middle' dominant-baseline='middle' fill='white' opacity='#{$opacity}' style='filter: grayscale(1);'%3E#{$emoji}%3C/text%3E%3Ctext x='#{$size / 2}' y='#{$size + $size / 2 + $size * 0.28}' font-size='#{$size * 0.7}' text-anchor='middle' dominant-baseline='middle' fill='white' opacity='#{$opacity}' style='filter: grayscale(1);'%3E#{$emoji}%3C/text%3E%3Ctext x='#{$size + $size / 2}' y='#{$size + $size / 2 + $size * 0.28}' font-size='#{$size * 0.7}' text-anchor='middle' dominant-baseline='middle' fill='white' opacity='#{$opacity}' style='filter: grayscale(1);'%3E#{$emoji}%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: #{$size * 2} #{$size * 2};
+    background-position: 0 0;
+}
+  
+  .artcard-bg-skulls   { @include chessboard-bg('💀', 52px, 0.12); }
+  .artcard-bg-stars    { @include chessboard-bg('🌟', 72px, 0.1); }
+  .artcard-bg-cats     { @include chessboard-bg('🐱', 70px, 0.12); }
+  .artcard-bg-birds    { @include chessboard-bg('🐦', 70px, 0.12); }
+  .artcard-bg-devils   { @include chessboard-bg('👿', 72px, 0.12); }
+  .artcard-bg-aliens   { @include chessboard-bg('👽', 72px, 0.12); }
+  .artcard-bg-hearts   { @include chessboard-bg('💗', 70px, 0.12); }
+  .artcard-bg-crystals { @include chessboard-bg('🔷', 70px, 0.12); }
+
+// Остальные стили (без изменений)
+.artcard-header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.artcard-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid $neon-green;
+  box-shadow: 0 0 20px $neon-green;
+  flex-shrink: 0;
+  
+  img, span {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: linear-gradient(135deg, $neon-pink, $neon-blue);
+  }
+}
+
+.artcard-name {
+  font-size: 28px;
+  color: $neon-vio;
+  text-shadow: 0 0 10px $neon-vio;
+  margin: 0;
+}
+
+.artcard-instrument {
+  color: $neon-blue;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.artcard-ticker {
+    // background: rgba(115, 0, 255, 0.85); /* цветной фон */
+    border: none;
+    border-radius: 0;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    // box-shadow: 0 0 8px rgba(0, 255, 255, 0.4), inset 0 0 4px rgba(0, 255, 255, 0.2);
+    animation: tickerGlow 0.15s infinite ease-in-out;
+    
+    marquee {
+      color: white; /* текст белый */
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  @keyframes tickerGlow {
+    0%, 100% {
+    //   box-shadow: 0 0 5px rgba(0, 255, 255, 0.3), inset 0 0 2px rgba(0, 255, 255, 0.2);
+      background: rgba(91, 209, 255, 0.114);
+    }
+    50% {
+    //   box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), inset 0 0 8px rgba(0, 255, 255, 0.5);
+      background: rgba(240, 0, 240, 0.1);
+    }
+  }
+// .artcard-ticker {
+//   background: rgba(0, 0, 0, 0.55);
+//   border: 2px solid $neon-purple;
+//   border-radius: 40px;
+//   padding: 10px 20px;
+//   margin-bottom: 24px;
+//   overflow: hidden;
+//   backdrop-filter: blur(4px);
+//   position: relative;
+//   z-index: 2;
+  
+//   marquee {
+//     color: $neon-green;
+//     font-size: 14px;
+//     font-weight: bold;
+//     letter-spacing: 1px;
+//   }
+// }
+
+.artcard-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+//   background: rgba(0, 0, 0, 0.45);
+  border-radius: 20px;
+//   backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 2;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  .detail-label {
+    color: $neon-purple;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+  
+  span:last-child {
+    color: white;
+    font-size: 14px;
+  }
+  
+  .ready-yes { color: $neon-green; }
+  .ready-no { color: $neon-pink; }
+}
+
+.artcard-section {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+  
+  h3 {
+    color: $neon-blue;
+    font-size: 14px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  
+  .tag {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid $neon-purple;
+    border-radius: 30px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: white;
+    transition: 0.2s;
+    
+    &:hover {
+      border-color: $neon-pink;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.promo-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+}
+
+.artcard-actions {
+    display: flex;
+    gap: 16px;
+    margin: 28px 0 20px;
+    position: relative;
+    z-index: 2;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    // backdrop-filter: blur(4px);
+    border: none;
+    border-radius: 6px;
+    // font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    &:hover::before {
+      left: 100%;
+    }
+    
+    &:active {
+      transform: scale(0.96);
+    }
+    
+    &.message-btn {
+      background: linear-gradient(95deg, rgba(0, 50, 70, 0.9), rgba(0, 80, 100, 0.85));
+      color: $neon-blue;
+      text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+      border: 1px solid rgba(0, 255, 255, 0.5);
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+      
+      &:hover {
+        background: rgba(0, 120, 150, 0.95);
+        color: #ffffff;
+        text-shadow: 0 0 6px cyan;
+        box-shadow: 0 0 18px rgba(0, 255, 255, 0.7);
+        border-color: rgba(0, 255, 255, 0.9);
+      }
+    }
+    
+    &.collab-btn {
+      background: linear-gradient(95deg, rgba(0, 60, 40, 0.9), rgba(0, 90, 60, 0.85));
+      color: $neon-green;
+      text-shadow: 0 0 4px rgba(0, 255, 157, 0.4);
+      border: 1px solid rgba(0, 255, 157, 0.5);
+      
+      &:hover {
+        background: rgba(0, 140, 100, 0.95);
+        color: #ffffff;
+        text-shadow: 0 0 6px #aaffdd;
+        box-shadow: 0 0 18px rgba(0, 255, 157, 0.7);
+        border-color: rgba(0, 255, 157, 0.9);
+      }
+      
+      &.active {
+        background: $neon-green;
+        color: #0a0a0f;
+        text-shadow: none;
+        border-color: #ffffff;
+        box-shadow: 0 0 20px $neon-green;
+        font-weight: bold;
+      }
+    }
+  }
+
+// .artcard-actions {
+//   display: flex;
+//   gap: 12px;
+//   margin: 24px 0;
+//   position: relative;
+//   z-index: 2;
+// }
+
+// .action-btn {
+//   flex: 1;
+//   padding: 12px;
+//   background: transparent;
+//   border: 2px solid;
+//   border-radius: 40px;
+//   font-family: 'Share Tech Mono', monospace;
+//   font-size: 14px;
+//   cursor: pointer;
+//   transition: all 0.3s ease;
+  
+//   &.message-btn {
+//     border-color: $neon-blue;
+//     color: $neon-blue;
+//     &:hover {
+//       background: $neon-blue;
+//       color: $dark-bg;
+//       box-shadow: 0 0 12px $neon-blue;
+//     }
+//   }
+  
+//   &.collab-btn {
+//     border-color: $neon-green;
+//     color: $neon-green;
+//     &:hover {
+//       background: $neon-green;
+//       color: $dark-bg;
+//       box-shadow: 0 0 12px $neon-green;
+//     }
+//     &.active {
+//       background: $neon-green;
+//       color: $dark-bg;
+//     }
+//   }
+// }
+
+.message-input {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+  
+  textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid $neon-purple;
+    border-radius: 16px;
+    padding: 12px;
+    color: white;
+    font-family: 'Share Tech Mono', monospace;
+    margin-bottom: 12px;
+    
+    &:focus {
+      outline: none;
+      border-color: $neon-pink;
+    }
+  }
+  
+  button {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 2px solid $neon-pink;
+    border-radius: 30px;
+    color: $neon-pink;
+    cursor: pointer;
+    
+    &:hover {
+      background: $neon-pink;
+      color: $dark-bg;
+    }
+  }
+}
+
+.artcard-messages {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+  display: none;
+  
+  h3 {
+    color: $neon-purple;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .message-item {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid $neon-green;
+    
+    .message-author {
+      color: $neon-green;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .message-text {
+      color: white;
+      font-size: 14px;
+    }
+    .message-date {
+      color: $neon-purple;
+      font-size: 10px;
+      text-align: right;
+      margin-top: 4px;
+    }
+  }
+}
+
+.back-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px solid $neon-purple;
+  border-radius: 40px;
+  color: $neon-purple;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  
+  &:hover {
+    border-color: $neon-pink;
+    color: $neon-pink;
+    background: rgba(255, 68, 204, 0.1);
+  }
+}
+
+.artcard-loader, .artcard-notfound {
+  text-align: center;
+  padding: 50px;
+  color: $neon-purple;
+  
+  button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 2px solid $neon-pink;
+    border-radius: 30px;
+    color: $neon-pink;
+    cursor: pointer;
+  }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
