@@ -1,0 +1,479 @@
+@import '../pages/variables.scss';
+
+.origin-reader {
+  position: absolute;
+  width: 100%;
+  min-height: 100%;
+  background: $dark-bg;
+  font-family: 'Share Tech Mono', monospace;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    pointer-events: none;
+  }
+}
+
+
+// .search-section {
+//   display: flex;
+//   justify-content: space-around;
+//   gap: 10px;
+//   margin-bottom: 0px;
+//   max-width: 500px;
+//   width: 100%;
+//   margin-left: auto;
+//   margin-right: auto;
+//     margin: 10px auto 30px auto;
+//     padding: 0;
+// //   padding: 0;
+
+//   .search-input {
+//     flex: 1;
+//     height: 48px;
+//     background: rgba(0,0,0,0.6);
+//     border: 2px solid $neon-purple;
+//     border-radius: 10px;
+//     padding: 0 15px;
+//     color: $neon-green;
+//     font-family: 'Share Tech Mono', monospace;
+//     font-size: 16px;
+
+//     &:focus {
+//       outline: none;
+//       border-color: $neon-pink;
+//       box-shadow: 0 0 20px $neon-pink;
+//     }
+//   }
+
+//   .search-btn {
+//     width: 48px;
+//     height: 48px;
+//     background: transparent;
+//     border: 2px solid $neon-pink;
+//     border-radius: 10px;
+//     color: $neon-pink;
+//     font-size: 20px;
+//     cursor: pointer;
+//     transition: all 0.3s ease;
+
+//     &:hover {
+//       background: $neon-pink;
+//       color: $dark-bg;
+//       box-shadow: 0 0 20px $neon-pink;
+//     }
+//   }
+// }
+
+.channel-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(10,10,15,0.8);
+  backdrop-filter: blur(10px);
+  border: 2px solid $neon-blue;
+  border-radius: 20px;
+  padding: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+
+  .channel-avatar {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    background: rgba(0,255,255,0.2);
+    border: 2px solid $neon-green;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    span {
+      font-size: 32px;
+    }
+  }
+
+  .channel-info {
+    flex: 1;
+    min-width: 0;
+
+    .channel-name {
+      color: $neon-pink;
+      font-size: 24px;
+      margin: 0 0 5px;
+      text-shadow: 0 0 10px $neon-pink;
+      word-break: break-word;
+    }
+
+    .channel-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+
+      .channel-author {
+        color: $neon-green;
+      }
+      .channel-stats {
+        color: $neon-purple;
+      }
+    }
+  }
+
+  .subscribe-btn {
+    padding: 10px 10px;
+    background: transparent;
+    border: 2px solid $neon-green;
+    border-radius: 30px;
+    color: $neon-green;
+    // font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background: $neon-green;
+      color: $dark-bg;
+      box-shadow: 0 0 20px $neon-green;
+    }
+
+    &.subscribed {
+      border-color: $neon-pink;
+      color: $neon-pink;
+      &:hover {
+        background: $neon-pink;
+        color: $dark-bg;
+      }
+    }
+  }
+}
+
+.search-section {
+    display: flex;
+    gap: 10px;
+    max-width: 500px;
+    width: 100%;
+    margin: 10px auto 30px auto;
+    padding: 0;
+  
+    .search-input {
+      flex: 1;
+      height: 48px;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid $neon-purple;
+      border-radius: 10px;
+      padding: 0 15px;
+      color: $neon-green;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 16px;
+      padding-left: 45px; 
+  
+      &:focus {
+        outline: none;
+        border-color: $neon-pink;
+        box-shadow: 0 0 20px $neon-pink;
+      }
+    }
+  
+    .search-btn {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border: 2px solid $neon-pink;
+      border-radius: 10px;
+      color: $neon-pink;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+  
+      &:hover {
+        background: $neon-pink;
+        color: $dark-bg;
+        box-shadow: 0 0 20px $neon-pink;
+      }
+    }
+  }
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.post-card {
+  background: rgba(1, 1, 30, 0.13);
+  border: 2px solid $neon-purple;
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+//   margin-bottom: 10px;
+
+  &:hover {
+    border-color: $neon-pink;
+    transform: translateX(5px);
+  }
+}
+
+.post-title {
+  color: $neon-blue;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-shadow: 0 0 5px $neon-blue;
+}
+
+.post-text {
+  color: white;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  white-space: pre-wrap;
+}
+
+.post-meta {
+  display: flex;
+  gap: 15px;
+  color: $neon-purple;
+  font-size: 12px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,0,255,0.2);
+}
+
+.comments-section {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,255,255,0.2);
+
+  .toggle-comments {
+    background: transparent;
+    border: none;
+    color: $neon-green;
+    font-family: 'Share Tech Mono', monospace;
+    cursor: pointer;
+    padding: 5px 0;
+    margin-bottom: 10px;
+
+    &:hover {
+      text-shadow: 0 0 5px $neon-green;
+    }
+  }
+
+  .comment-input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    display: none;
+
+    &.show {
+      display: flex;
+    }
+
+    input {
+      flex: 1;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid $neon-purple;
+      border-radius: 20px;
+      padding: 8px 15px;
+      color: white;
+      font-family: 'Share Tech Mono', monospace;
+
+      &:focus {
+        outline: none;
+        border-color: $neon-pink;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+
+    button {
+      background: transparent;
+      border: 2px solid $neon-green;
+      border-radius: 20px;
+      padding: 5px 15px;
+      color: $neon-green;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: $neon-green;
+        color: $dark-bg;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.comment-item {
+  background: rgba(0,0,0,0.3);
+  border: 1px dashed $neon-purple;
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  .comment-author {
+    color: $neon-green;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .comment-text {
+    color: white;
+    font-size: 14px;
+  }
+}
+
+.empty-state, .empty-posts {
+  text-align: center;
+  padding: 50px;
+  color: $neon-purple;
+
+  h3 {
+    color: $neon-pink;
+    margin-bottom: 10px;
+  }
+
+  button {
+    margin-top: 20px;
+  }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+  
+    button {
+      flex: 1;
+      max-width: 200px;
+      padding: 10px 20px;
+      background: transparent;
+      border: 2px solid $neon-purple;
+      border-radius: 30px;
+      color: $neon-purple;
+      font-family: 'Share Tech Mono', monospace;
+      cursor: pointer;
+      transition: all 0.3s ease;
+  
+      &:hover {
+        border-color: $neon-pink;
+        color: $neon-pink;
+      }
+    }
+  
+    .back-btn:hover {
+      transform: translateX(-5px);
+    }
+  
+    .share-btn:hover {
+      transform: translateX(5px);
+    }
+  }
+  
+// .back-btn {
+//   margin-top: 30px;
+//   padding: 10px 20px;
+//   background: transparent;
+//   border: 2px solid $neon-purple;
+//   border-radius: 30px;
+//   color: $neon-purple;
+//   font-family: 'Share Tech Mono', monospace;
+//   cursor: pointer;
+//   transition: all 0.3s ease;
+
+//   &:hover {
+//     border-color: $neon-pink;
+//     color: $neon-pink;
+//     transform: translateX(-5px);
+//   }
+// }
+
+// .action-buttons {
+//     display: flex;
+//     gap: 15px;
+//     justify-content: center;
+//     margin-top: 30px;
+  
+//     .back-btn, .share-btn {
+//       padding: 10px 20px;
+//       background: transparent;
+//       border: 2px solid $neon-purple;
+//       border-radius: 30px;
+//       color: $neon-purple;
+//       font-family: 'Share Tech Mono', monospace;
+//       cursor: pointer;
+//       transition: all 0.3s ease;
+  
+//       &:hover {
+//         border-color: $neon-pink;
+//         color: $neon-pink;
+//         transform: translateX(-5px);
+//       }
+//     }
+  
+//     .share-btn:hover {
+//       transform: translateX(5px);
+//     }
+//   }
+
+.loader {
+  text-align: center;
+  padding: 50px;
+  color: $neon-green;
+  font-size: 24px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  .origin-reader {
+    padding: 10px;
+  }
+
+  .channel-header {
+    .channel-avatar {
+      width: 50px;
+      height: 50px;
+    }
+    .channel-name {
+      font-size: 18px;
+    }
+  }
+}
