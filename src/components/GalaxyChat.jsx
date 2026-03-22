@@ -16,7 +16,8 @@ const GalaxyChat = () => {
 
   // Подключение к WebSocket
   const connect = (room) => {
-    const socket = new WebSocket(`${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}`);
+    const socket = new WebSocket(`wss://galaxy-zbyh.onrender.com`);
+    // const socket = new WebSocket(`${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}`);
     
     socket.onopen = () => {
       socket.send(JSON.stringify({
