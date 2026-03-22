@@ -31,6 +31,7 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
     '@@login': { path: '/login', desc: 'авторизоваться' },
     '@@st': { path: '/startpage', desc: 'Стартовая страница' },
     '@@pf': { path: '/galaxy/', desc: 'Твой профиль' },
+    '@@artcard': { path: null, desc: '@@artcard abcdef — открыть визитку по ID' },
     '@@find': { path: '/finder/', desc: 'Твой профиль' },
     '@@cyberchat': { path: '/messenger', desc: 'Мессенджер' },
     '@@mk': { path: '/market', desc: 'продавать' },
@@ -147,6 +148,14 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
     else if (cmd.startsWith('@@origin ')) {
       const originId = cmd.replace('@@origin ', '').trim();
       navigate(`/origin/${originId}`);
+    }
+    else if (cmd.startsWith('@@artcard ')) {
+      const artcardId = cmd.replace('@@artcard ', '').trim();
+      if (artcardId) {
+        navigate(`/artcard/${artcardId}`);
+      } else {
+        setMessage({ type: 'error', text: 'Укажи ID визитки: @@artcard abcdef' });
+      }
     }
     else {
       setHistory(prev => [...prev, { 
