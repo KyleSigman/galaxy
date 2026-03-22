@@ -37,6 +37,7 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
     '@@mkp': { path: '/marketplace', desc: 'Галактик маркет' },
     '@@postvid': { path: null, desc: 'Опубликовать видео дня' },
     '@@news': { path: '/news', desc: 'лента' },
+    '@@origin': { path: null, desc: '@@origin XK79P2 — открыть канал по ID' },
     '@@getnews': { path: null, desc: 'Показать свежие видео' },
     '@@help': { path: null, desc: 'Показать все команды' },
     '@@send': { path: null, desc: 'Отправить личное сообщение (пример: @@sendto KateDark привет)' },
@@ -142,6 +143,10 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
       if (commands[cmd].path) {
         setTimeout(() => navigate(commands[cmd].path), 500);
       }
+    }
+    else if (cmd.startsWith('@@origin ')) {
+      const originId = cmd.replace('@@origin ', '').trim();
+      navigate(`/origin/${originId}`);
     }
     else {
       setHistory(prev => [...prev, { 
