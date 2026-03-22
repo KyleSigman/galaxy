@@ -30,6 +30,7 @@ import GalaxyProfile from "./components/GalaxyProfile";
 import StartPage from "./components/StartPage"
 import News from "./components/Posts"
 import OriginReader from "./components/OriginReader";
+import ArtCard from "./components/ArtCard";
 
 // function App() {
 
@@ -81,6 +82,7 @@ function App() {
           <Route path="/messenger/" element={<Messenger/>} />
           <Route path="/finder/" element={<Finder/>} />
           <Route path="/origin/:channelId" element={<OriginReader />} />
+          <Route path="/artcard/:artcardId" element={<ArtCard />} />
 
         </Route>
       </Routes>
