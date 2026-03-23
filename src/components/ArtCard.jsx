@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../galaconfig';
 import './ArtCard.scss';
-import StarField from './StarField';
+import { QRCodeCanvas } from 'qrcode.react';
+// import QRCode from 'qrcode.react';
 
 const ArtCard = () => {
   const { artcardId } = useParams();
@@ -15,6 +16,8 @@ const ArtCard = () => {
   const [showMessageInput, setShowMessageInput] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [collabRequested, setCollabRequested] = useState(false);
+  const [activeTab, setActiveTab] = useState('base');
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Текущий пользователь
   useEffect(() => {
@@ -102,6 +105,141 @@ const ArtCard = () => {
     }
   };
 
+  // Поделиться — копировать ссылку
+  const shareProfile = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  // Данные для вкладки БАЗА (без телефона)
+  const baseData = [
+    { label: 'стиль', value: card?.style },
+    { label: 'стаж', value: card?.experience ? `${card.experience} лет` : null },
+    { label: 'проекты', value: card?.projects, isArray: true },
+    { label: 'актуальный проект', value: card?.actualproject, isArray: true },
+    { label: 'любимые группы', value: card?.favband, isArray: true },
+    // { label: 'разогревы', value: card?.support, isArray: true },
+    { label: 'эндорсмент', value: card?.endorsement },
+    { label: 'образование', value: card?.education },
+    { label: 'оборудование', value: card?.gear },
+    { label: 'прайс', value: card?.price },
+    { label: 'статус', value: card?.status }
+    // { label: 'FEATS / коллаборации', value: card?.feats, isMultiline: true }
+  ];
+
+  // Данные для вкладки ХАРАКТЕР (без алкоголя, сообщений, оформления)
+  const characterData = [
+    { label: 'творческий подход', value: card?.creativeApproach },
+    { label: 'движения на сцене', value: card?.stageMovement },
+    { label: 'сценический образ', value: card?.stageLook },
+    { label: 'уровень вовлеченности', value: card?.commitment },
+    { label: 'любимая техника', value: card?.favTechnique },
+    { label: 'девиз / кредо', value: card?.motto },
+    { label: 'коммуникация', value: card?.communication },
+    { label: '+1 на репе', value: card?.plusOne },
+    { label: 'вайб', value: card?.vibe, isMultiline: true }
+  ];
+
+  const renderTabContent = () => {
+    if (activeTab === 'base') {
+      return (
+        <div className="artcard-details">
+          {baseData.map((item, idx) => {
+            if (!item.value) return null;
+            if (item.isArray && Array.isArray(item.value) && item.value.length > 0) {
+              return (
+                <div key={idx} className="detail-item">
+                  <span className="detail-label">⟁ {item.label}</span>
+                  <div className="tags">
+                    {item.value.map((v, i) => <span key={i} className="tag">{v}</span>)}
+                  </div>
+                </div>
+              );
+            }
+            if (item.isMultiline && item.value) {
+              return (
+                <div key={idx} className="detail-item">
+                  <span className="detail-label">⟁ {item.label}</span>
+                  <span className="multiline-text">{item.value}</span>
+                </div>
+              );
+            }
+            return (
+              <div key={idx} className="detail-item">
+                <span className="detail-label">⟁ {item.label}</span>
+                <span>{item.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (activeTab === 'character') {
+      return (
+        <div className="artcard-details">
+          {characterData.map((item, idx) => {
+            if (!item.value) return null;
+            if (item.isMultiline) {
+              return (
+                <div key={idx} className="detail-item">
+                  <span className="detail-label">⟁ {item.label}</span>
+                  <span className="multiline-text">{item.value}</span>
+                </div>
+              );
+            }
+            return (
+              <div key={idx} className="detail-item">
+                <span className="detail-label">⟁ {item.label}</span>
+                <span>{item.value}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (activeTab === 'contact') {
+      return (
+        <div className="artcard-details">
+          {/* Ссылки на релизы */}
+          {card?.releaseLinks && (
+            <div className="detail-item">
+              <span className="detail-label">⟁ ссылки на релизы</span>
+              <span className="multiline-text">{card.releaseLinks}</span>
+            </div>
+          )}
+          
+          {/* QR-код */}
+          <div className="detail-item">
+            <span className="detail-label">⟁ QR-код</span>
+            <div className="qr-container">
+            <QRCodeCanvas 
+              value={`${window.location.origin}/artcard/${artcardId}`} 
+              size={120}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              level="L"
+            />
+            </div>
+          </div>
+          
+          {/* Кнопка поделиться */}
+          <div className="detail-item">
+            <span className="detail-label">⟁ поделиться</span>
+            <button className="share-btn" onClick={shareProfile}>
+              {copySuccess ? '✓ СКОПИРОВАНО' : '📋 КОПИРОВАТЬ ССЫЛКУ'}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   if (loading) {
     return <div className="artcard-loader">✦ ЗАГРУЗКА ✦</div>;
   }
@@ -120,133 +258,86 @@ const ArtCard = () => {
 
   return (
     <div className="ArtCard">
-              <StarField />
-        <div className={`artcard ${bgClass}`}>
-      <div className="artcard-header">
-        <div className="artcard-avatar">
-          {userData.avatar ? (
-            <img src={userData.avatar} alt={userData.galaxyName} />
-          ) : (
-            <span>{userData.galaxyName?.charAt(0) || '🎤'}</span>
-          )}
-        </div>
-        <div className="artcard-info">
-          <h1 className="artcard-name">{userData.galaxyName}</h1>
-          <div className="artcard-instrument">{card.instrument || 'музыкант'}</div>
-        </div>
-      </div>
-
-      {card.ticker && (
-        <div className="artcard-ticker">
-          <marquee behavior="scroll" direction="left">{card.ticker}</marquee>
-        </div>
-      )}
-
-      {/* ========== БЛОК UI — ПЕРЕНЕСЁН НАВЕРХ ========== */}
-      <div className="artcard-actions">
-        <button 
-          className="action-btn message-btn"
-          onClick={() => setShowMessageInput(!showMessageInput)}
-        >
-          💬 НАПИСАТЬ
-        </button>
-        <button 
-          className={`action-btn collab-btn ${collabRequested ? 'active' : ''}`}
-          onClick={toggleCollabRequest}
-        >
-          {collabRequested ? '✅ отправлено' : '👏 гоу фит'}
-        </button>
-      </div>
-
-      {showMessageInput && (
-        <div className="message-input">
-          <textarea
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            placeholder="Ваше сообщение..."
-            rows="3"
-          />
-          <button onClick={sendMessage}>➤ ОТПРАВИТЬ</button>
-        </div>
-      )}
-
-      {card.messages?.length > 0 && (
-        <div className="artcard-messages">
-          <h3>💬 сообщения</h3>
-          {card.messages.map((msg, i) => (
-            <div key={i} className="message-item">
-              <div className="message-author">@{msg.fromName}</div>
-              <div className="message-text">{msg.text}</div>
-              <div className="message-date">{new Date(msg.date).toLocaleString()}</div>
+      <div className={`artcard ${bgClass}`}>
+        <div className="artcard-header">
+          <div className="artcard-avatar">
+            {userData.avatar ? (
+              <img src={userData.avatar} alt={userData.galaxyName} />
+            ) : (
+              <span>{userData.galaxyName?.charAt(0) || '🎤'}</span>
+            )}
+          </div>
+          <div className="artcard-info">
+            <h1 className="artcard-name">{userData.galaxyName}</h1>
+            <div className="artcard-instrument">
+              {card.instruments?.length > 0 
+                ? card.instruments.join(', ') 
+                : (card.instrument || 'музыкант')}
             </div>
-          ))}
+          </div>
         </div>
-      )}
-      {/* ========== КОНЕЦ БЛОКА UI ========== */}
 
-      <div className="artcard-details">
-        {card.experience && (
-          <div className="detail-item">
-            <span className="detail-label">🎸 стаж</span>
-            <span>{card.experience} лет</span>
+        {card.ticker && (
+          <div className="artcard-ticker">
+            <marquee behavior="scroll" direction="left">{card.ticker}</marquee>
           </div>
         )}
-        {card.style && (
-          <div className="detail-item">
-            <span className="detail-label">🎵 стиль</span>
-            <span>{card.style}</span>
-          </div>
-        )}
-        {card.location && (
-          <div className="detail-item">
-            <span className="detail-label">📍 локация</span>
-            <span>{card.location}</span>
-          </div>
-        )}
-        <div className="detail-item">
-          <span className="detail-label">💪 готовность</span>
-          <span className={card.ready ? 'ready-yes' : 'ready-no'}>
-            {card.ready ? 'готов к сотрудничеству' : 'пока не ищу'}
-          </span>
+
+        <div className="artcard-actions">
+          <button 
+            className="action-btn message-btn"
+            onClick={() => setShowMessageInput(!showMessageInput)}
+          >
+            НАПИСАТЬ
+          </button>
+          <button 
+            className={`action-btn collab-btn ${collabRequested ? 'active' : ''}`}
+            onClick={toggleCollabRequest}
+          >
+            {collabRequested ? '✅ ОТПРАВЛЕНО' : 'КОЛЛАБ'}
+          </button>
         </div>
+
+        {showMessageInput && (
+          <div className="message-input">
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder="Ваше сообщение..."
+              rows="3"
+            />
+            <button onClick={sendMessage}>➤ ОТПРАВИТЬ</button>
+          </div>
+        )}
+
+        <div className="artcard-tabs">
+          <button 
+            className={`tab-btn ${activeTab === 'base' ? 'active' : ''}`}
+            onClick={() => setActiveTab('base')}
+          >
+            общее
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'character' ? 'active' : ''}`}
+            onClick={() => setActiveTab('character')}
+          >
+            характер
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
+            onClick={() => setActiveTab('contact')}
+          >
+            связь
+          </button>
+        </div>
+
+        {renderTabContent()}
+
+        <button className="back-btn" onClick={() => navigate('/')}>
+          ← НА ГЛАВНУЮ
+        </button>
+
       </div>
-
-      {card.projects?.length > 0 && (
-        <div className="artcard-section">
-          <h3>🎧 проекты</h3>
-          <div className="tags">
-            {card.projects.map((p, i) => <span key={i} className="tag">{p}</span>)}
-          </div>
-        </div>
-      )}
-
-      {card.favbands?.length > 0 && (
-        <div className="artcard-section">
-          <h3>💿 любимые группы</h3>
-          <div className="tags">
-            {card.favbands.map((b, i) => <span key={i} className="tag">{b}</span>)}
-          </div>
-        </div>
-      )}
-
-      {card.promo && (
-        <div className="artcard-section">
-          <h3>📢 промо</h3>
-          <p className="promo-text">{card.promo}</p>
-        </div>
-      )}
-
-      {card.price && (
-        <div className="artcard-section">
-          <h3>💰 цена за сет</h3>
-          <p className="price-text">{card.price} ⚡</p>
-        </div>
-      )}
-
-      <button className="back-btn" onClick={() => navigate('/')}>
-        ← НА ГЛАВНУЮ
-      </button>
-    </div>
     </div>
   );
 };
