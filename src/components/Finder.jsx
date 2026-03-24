@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../galaconfig";
 import { collection, getDocs } from "firebase/firestore";
-// import StarField from './StarField';
+import StarField from './StarField';
 import { Link } from "react-router-dom";
 
 const SearchPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedInstrument, setSelectedInstrument] = useState('');
+  const [searchField, setSearchField] = useState('all'); // all, id, style, instruments, favbands
   const [expandedCards, setExpandedCards] = useState({});
 
   const instruments = [
     "барабаны", "перкуссия", "гитара", "бас", "вокал", "клавиши",
     "сэмплер", "виола", "труба", "флейта", "скрипка", "контрабас",
     "пианино", "джембе", "бубен", "треугольник", "аккордеон", "другое"
+  ];
+
+  const searchOptions = [
+    { value: 'all', label: 'везде' },
+    { value: 'id', label: 'по ID' },
+    { value: 'style', label: 'по стилю' },
+    { value: 'instruments', label: 'по инструментам' },
+    { value: 'favband', label: 'по группам' }
   ];
 
   useEffect(() => {
@@ -43,16 +52,31 @@ const SearchPage = () => {
     }));
   };
 
+  const matchesSearchField = (blog, searchTerm) => {
+    const lowerTerm = searchTerm.toLowerCase();
+    
+    switch (searchField) {
+      case 'id':
+        return blog.artcardId?.toLowerCase() === lowerTerm;
+      case 'style':
+        return blog.style?.toLowerCase().includes(lowerTerm);
+      case 'instruments':
+        return blog.instruments?.some(inst => inst.toLowerCase().includes(lowerTerm));
+        case 'favband':
+          return blog.favband?.some(band => band.toLowerCase().includes(lowerTerm));
+        default: // 'all'
+        return (
+          (blog.artcardId && blog.artcardId.toLowerCase() === lowerTerm) ||
+          (blog.style && blog.style.toLowerCase().includes(lowerTerm)) ||
+          (blog.instruments && blog.instruments.some(inst => inst.toLowerCase().includes(lowerTerm))) ||
+          (blog.favband && blog.favband.some(band => band.toLowerCase().includes(lowerTerm)))
+        );
+    }
+  };
+
   const filteredBlogs = blogs.filter(blog => {
-    const lowerSearch = search.toLowerCase();
-    const matchesSearch = !search ? true : (
-      (blog.artcardId && blog.artcardId.toLowerCase().includes(lowerSearch)) ||
-      (blog.style && blog.style.toLowerCase().includes(lowerSearch)) ||
-      (blog.instruments && blog.instruments.some(inst => inst.toLowerCase().includes(lowerSearch)))
-    );
-    
+    const matchesSearch = !search ? true : matchesSearchField(blog, search);
     const instrumentMatch = !selectedInstrument ? true : blog.instruments?.includes(selectedInstrument);
-    
     return matchesSearch && instrumentMatch;
   });
 
@@ -64,7 +88,7 @@ const SearchPage = () => {
       { label: "стаж", value: blog.experience ? `${blog.experience} лет` : null },
       { label: "стиль", value: blog.style },
       { label: "проекты", value: blog.projects?.length > 0 ? blog.projects.join(", ") : null },
-      { label: "фавориты", value: blog.favbands?.length > 0 ? blog.favbands.join(", ") : null },
+      { label: "любимые группы", value: blog.favband?.length > 0 ? blog.favband.join(", ") : null },
       { label: "образование", value: blog.education },
       { label: "эндорсмент", value: blog.endorsement },
       { label: "оборудование", value: blog.gear },
@@ -97,15 +121,27 @@ const SearchPage = () => {
 
   return (
     <div className="Finder">
-      {/* <StarField /> */}
+      <StarField />
       
       <div className="search-section2">
         <div className="search-form">
           <input 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
-            placeholder="поиск по имени, стилю, инструменту..."
+            placeholder="поиск..."
           />
+        </div>
+
+        <div className="search-options">
+          {searchOptions.map(option => (
+            <div
+              key={option.value}
+              className={`search-option-chip ${searchField === option.value ? 'active' : ''}`}
+              onClick={() => setSearchField(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
         </div>
 
         <div className="instruments-grid">
@@ -122,7 +158,7 @@ const SearchPage = () => {
 
         {selectedInstrument && (
           <button onClick={() => setSelectedInstrument('')} className="reset-btn">
-            ✕ сбросить фильтр
+            ✕ сбросить фильтр инструмента
           </button>
         )}
       </div>
