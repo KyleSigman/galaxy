@@ -3,20 +3,17 @@ import { db } from '../galaconfig';
 import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import StarField from '../components/StarField';
+// import SkyBoxR from "../components/SkyBoxR";
 import './RegisterWizard.scss';
 
 const RegisterWizard = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     galaxyName: '',
-    instruments: [],
-    styles: [],
     avatar: '',
     key: ''
   });
   const [avatarProgress, setAvatarProgress] = useState(0);
-  const [styleInput, setStyleInput] = useState('');
-  const [visualKeyCanvas, setVisualKeyCanvas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [avatarUploaded, setAvatarUploaded] = useState(false);
@@ -42,7 +39,6 @@ const RegisterWizard = () => {
 
   // Ресайз и конвертация аватара
   const resizeAndConvertToBase64 = (file, maxWidth = 100, onProgress) => {
-    
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -83,50 +79,7 @@ const RegisterWizard = () => {
     return x - Math.floor(x);
   };
 
-    // const drawVisualKey = (key) => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) return;
-    
-  //   const ctx = canvas.getContext('2d');
-  //   canvas.width = 200;
-  //   canvas.height = 200;
-    
-  //   ctx.fillStyle = '#0a0a0f';
-  //   ctx.fillRect(0, 0, 200, 200);
-    
-  //   const colors = ['#ff00ff', '#00ffff', '#b300ff', '#00ff9d', '#ffff00'];
-  //   const seed = key.split('').map(c => c.charCodeAt(0)).reduce((a, b) => a + b, 0);
-    
-  //   for (let i = 0; i < 15; i++) {
-  //     ctx.beginPath();
-  //     const startX = (Math.sin(seed + i) * 50 + 100);
-  //     const startY = (Math.cos(seed + i * 2) * 50 + 100);
-  //     const endX = (Math.sin(seed + i + 5) * 70 + 100);
-  //     const endY = (Math.cos(seed + i + 3) * 70 + 100);
-      
-  //     ctx.moveTo(startX, startY);
-  //     ctx.lineTo(endX, endY);
-  //     ctx.strokeStyle = colors[i % colors.length];
-  //     ctx.lineWidth = Math.random() * 3 + 1;
-  //     ctx.stroke();
-  //   }
-    
-  //   for (let i = 0; i < 30; i++) {
-  //     ctx.beginPath();
-  //     const x = Math.sin(seed + i * 3) * 80 + 100;
-  //     const y = Math.cos(seed + i * 2) * 80 + 100;
-  //     ctx.arc(x, y, Math.random() * 3 + 1, 0, Math.PI * 2);
-  //     ctx.fillStyle = colors[i % colors.length];
-  //     ctx.fill();
-  //   }
-    
-  //   setVisualKeyCanvas(canvas.toDataURL());
-  // };
-
-
   // Рисование визуального ключа
-  
-
   const drawVisualKey = (key) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -174,8 +127,6 @@ const RegisterWizard = () => {
       ctx.fillStyle = colors[Math.floor(seededRandom(seed, i + 450) * colors.length)];
       ctx.fill();
     }
-    
-    setVisualKeyCanvas(canvas.toDataURL());
   };
 
   const extractGridColors = (canvas) => {
@@ -199,53 +150,18 @@ const RegisterWizard = () => {
         }
         
         if (count > 0) {
-          // Вместо объекта - просто числа подряд
           colors.push(
-            gx*step + step/2,  // x
-            gy*step + step/2,  // y
-            Math.floor(r/count), // r
-            Math.floor(g/count), // g
-            Math.floor(b/count)  // b
+            gx*step + step/2,
+            gy*step + step/2,
+            Math.floor(r/count),
+            Math.floor(g/count),
+            Math.floor(b/count)
           );
         }
       }
     }
-    return colors; // теперь массив чисел, а не объектов
+    return colors;
   };
-
-  // const extractGridColors = (canvas) => {
-  //   const ctx = canvas.getContext('2d');
-  //   const colors = [];
-  //   const step = 66; // 200 / 3 ≈ 66
-    
-  //   for (let gy = 0; gy < 3; gy++) {
-  //     for (let gx = 0; gx < 3; gx++) {
-  //       const imageData = ctx.getImageData(gx*step, gy*step, step, step);
-  //       const data = imageData.data;
-        
-  //       let r=0,g=0,b=0,count=0;
-  //       for (let i=0; i<data.length; i+=4) {
-  //         if (data[i] > 50 || data[i+1] > 50 || data[i+2] > 50) {
-  //           r += data[i];
-  //           g += data[i+1];
-  //           b += data[i+2];
-  //           count++;
-  //         }
-  //       }
-        
-  //       if (count > 0) {
-  //         colors.push({
-  //           x: gx*step + step/2,
-  //           y: gy*step + step/2,
-  //           r: Math.floor(r/count),
-  //           g: Math.floor(g/count),
-  //           b: Math.floor(b/count)
-  //         });
-  //       }
-  //     }
-  //   }
-  //   return colors;
-  // };
 
   // Обработчики шагов
   const handleGalaxyNameSubmit = async () => {
@@ -261,50 +177,7 @@ const RegisterWizard = () => {
     }
     
     setError('');
-    setStep(3); // Переход к инструментам
-  };
-
-  const handleInstrumentToggle = (instrument) => {
-    const updated = formData.instruments.includes(instrument)
-      ? formData.instruments.filter(i => i !== instrument)
-      : [...formData.instruments, instrument];
-    setFormData({...formData, instruments: updated});
-  };
-
-  const handleInstrumentsSubmit = () => {
-    if (formData.instruments.length === 0) {
-      setError('Выбери хотя бы один инструмент');
-      return;
-    }
-    setError('');
-    setStep(4); // Переход к стилям
-  };
-
-  const handleStyleAdd = () => {
-    if (!styleInput.trim()) return;
-    if (formData.styles.includes(styleInput)) return;
-    
-    setFormData({
-      ...formData, 
-      styles: [...formData.styles, styleInput]
-    });
-    setStyleInput('');
-  };
-
-  const handleStyleRemove = (style) => {
-    setFormData({
-      ...formData,
-      styles: formData.styles.filter(s => s !== style)
-    });
-  };
-
-  const handleStylesSubmit = () => {
-    if (formData.styles.length === 0) {
-      setError('Добавь хотя бы один стиль');
-      return;
-    }
-    setError('');
-    setStep(5); // Переход к аватару
+    setStep(3); // Переход к аватару (шаг 3 вместо 5)
   };
 
   const handleAvatarUpload = async (e) => {
@@ -330,54 +203,22 @@ const RegisterWizard = () => {
       return;
     }
     setError('');
-    setStep(6); // Переход к генерации ключа
+    setStep(4); // Переход к генерации ключа (шаг 4 вместо 6)
   };
 
-    // В handleGenerateKey:
-    const handleGenerateKey = () => {
-      const key = generateKey();
-      setFormData({...formData, key});
+  const handleGenerateKey = () => {
+    const key = generateKey();
+    setFormData({...formData, key});
 
-      setTimeout(() => {
-        drawVisualKey(key);
-        const colors = extractGridColors(canvasRef.current);  // ← новая функция
-        setFormData(prev => ({ 
-          ...prev, 
-          vpoints: JSON.stringify(colors)  // ← сохраняем цвета сетки
-        }));
-      }, 100);
-
-      // setTimeout(() => {
-      //   drawVisualKey(key);
-      //   const points = captureColorPoints();
-      //   setFormData(prev => ({ ...prev, visualPoints: points }));
-      // }, 100);
-    };
-    // const handleGenerateKey = () => {
-    //   const key = generateKey();
-    //   setFormData({...formData, key});
-      
-    //   setTimeout(() => {
-    //     drawVisualKey(key);
-    //   }, 100);
-    // };
-
-  // const handleGenerateKey = () => {
-  //   const key = generateKey();
-  //   setFormData({...formData, key});
-    
-  //   // Даем время отрендерить canvas
-  //   setTimeout(() => {
-  //     drawVisualKey(key);
-  //   }, 100);
-  // };
-
-  // const handleGenerateKey = () => {
-  //   const key = generateKey();
-  //   setFormData({...formData, key});
-  //   drawVisualKey(key);
-  // };
-
+    setTimeout(() => {
+      drawVisualKey(key);
+      const colors = extractGridColors(canvasRef.current);
+      setFormData(prev => ({ 
+        ...prev, 
+        vpoints: JSON.stringify(colors)
+      }));
+    }, 100);
+  };
 
   const handleKeySubmit = () => {
     if (!formData.key) {
@@ -385,7 +226,7 @@ const RegisterWizard = () => {
       return;
     }
     setError('');
-    setStep(7); // Переход к финалу
+    setStep(5); // Переход к финалу (шаг 5 вместо 7)
   };
 
   const handleSubmit = async () => {
@@ -394,12 +235,8 @@ const RegisterWizard = () => {
       await setDoc(doc(db, 'users', formData.key), {
         uid: formData.key,
         galaxyName: formData.galaxyName,
-        instruments: formData.instruments,
-        styles: formData.styles,
         avatar: formData.avatar,
         vpoints: formData.vpoints,
-        // visualPoints: formData.visualPoints, 
-        // visualKey: visualKeyCanvas,
         createdAt: new Date().toISOString()
       });
       
@@ -437,20 +274,20 @@ const RegisterWizard = () => {
 
   return (
     <div className="register-wizard">
+      {/* <SkyBoxR /> */}
       <StarField />
-      
       <div className="wizard-container">
         <div className="wizard-header">
           <h1>✦ РЕГИСТРАЦИЯ ✦</h1>
           <div className="step-indicator">
-            {[1,2,3,4,5,6,7].map(s => (
+            {[1,2,3,4,5].map(s => (
               <div 
                 key={s}
                 className={`step-dot ${s === step ? 'active' : ''} ${s < step ? 'completed' : ''}`}
               />
             ))}
           </div>
-          <span className="step-count">шаг {step} из 7</span>
+          <span className="step-count">шаг {step} из 5</span>
         </div>
 
         <div className="wizard-content">
@@ -468,7 +305,7 @@ const RegisterWizard = () => {
           {/* Шаг 2: Galaxy Name */}
           {step === 2 && (
             <div className="step-galaxyname">
-              <h3>ВВЕДИ GALAXY NAME</h3>
+              <h3>ВВЕДИ ИМЯ</h3>
               <p>он будет отображаться как @{formData.galaxyName || 'имя'}</p>
               
               <input
@@ -488,79 +325,8 @@ const RegisterWizard = () => {
             </div>
           )}
 
-          {/* Шаг 3: Инструменты */}
+          {/* Шаг 3: Аватар */}
           {step === 3 && (
-            <div className="step-instruments">
-              <h3>специализация</h3>
-              <p>можно выбрать несколько</p>
-              
-              <div className="instruments-grid">
-                {[
-                  {id: 'guitar', label: '🎸 Гитара'},
-                  {id: 'bass', label: '🎸 Бас'},
-                  {id: 'drums', label: '😈 Барабаны'},
-                  {id: 'vocal', label: '🎤 Вокал'},
-                  {id: 'keys', label: '🎹 Клавиши'},
-                  {id: 'producer', label: '😎 Продюсер'}
-                ].map(inst => (
-                  <label key={inst.id} className="instrument-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={formData.instruments.includes(inst.id)}
-                      onChange={() => handleInstrumentToggle(inst.id)}
-                    />
-                    <span>{inst.label}</span>
-                  </label>
-                ))}
-              </div>
-              
-              {error && <div className="error-message">{error}</div>}
-              
-              <button onClick={handleInstrumentsSubmit} className="btn-next">
-                ПОДТВЕРДИТЬ
-              </button>
-            </div>
-          )}
-
-          {/* Шаг 4: Стили */}
-          {step === 4 && (
-            <div className="step-styles">
-              <h3>ТВОЙ СТИЛЬ</h3>
-              <p>добавляй стили через Enter или кнопку +</p>
-              
-              <div className="styles-input">
-                <input
-                  type="text"
-                  value={styleInput}
-                  onChange={(e) => setStyleInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleStyleAdd()}
-                  placeholder="рок"
-                />
-                <button onClick={handleStyleAdd}>+</button>
-              </div>
-              
-              <div className="styles-tags">
-                {formData.styles.map(style => (
-                  <span key={style} className="style-tag">
-                    {style}
-                    <button onClick={() => handleStyleRemove(style)}>✕</button>
-                  </span>
-                ))}
-              </div>
-              
-              {error && <div className="error-message">{error}</div>}
-              
-              <button 
-                onClick={handleStylesSubmit} 
-                className="btn-next"
-              >
-                ПОДТВЕРДИТЬ
-              </button>
-            </div>
-          )}
-
-          {/* Шаг 5: Аватар */}
-          {step === 5 && (
             <div className="step-avatar">
               <h3>ЗАГРУЗИ АВАТАР</h3>
               
@@ -601,8 +367,8 @@ const RegisterWizard = () => {
             </div>
           )}
 
-          {/* Шаг 6: Генерация ключа */}
-          {step === 6 && (
+          {/* Шаг 4: Генерация ключа */}
+          {step === 4 && (
             <div className="step-key">
               <h3>ТВОЙ УНИКАЛЬНЫЙ КЛЮЧ</h3>
               
@@ -620,12 +386,12 @@ const RegisterWizard = () => {
                   />
 
                   <div className="key-actions">
-                        <button onClick={downloadVisualKey} className="btn-download">
-                          📷 СКАЧАТЬ КАРТИНКУ
-                        </button>
-                        <button onClick={downloadKeyFile} className="btn-download">
-                          🔑 СКАЧАТЬ .COSMO
-                        </button>
+                    <button onClick={downloadVisualKey} className="btn-download">
+                      📷 СКАЧАТЬ КАРТИНКУ
+                    </button>
+                    <button onClick={downloadKeyFile} className="btn-download">
+                      🔑 СКАЧАТЬ .COSMO
+                    </button>
                   </div>
                   
                   <p className="key-warning">
@@ -642,8 +408,8 @@ const RegisterWizard = () => {
             </div>
           )}
 
-          {/* Шаг 7: Финал */}
-          {step === 7 && (
+          {/* Шаг 5: Финал */}
+          {step === 5 && (
             <div className="step-final">
               <h3>ТВОЙ ПРОФИЛЬ ГОТОВ!</h3>
               
@@ -653,8 +419,6 @@ const RegisterWizard = () => {
                 )}
                 <div className="final-info">
                   <p><span className="label">GALAXY NAME:</span> @{formData.galaxyName}</p>
-                  <p><span className="label">ИНСТРУМЕНТЫ:</span> {formData.instruments.join(', ')}</p>
-                  <p><span className="label">СТИЛИ:</span> {formData.styles.join(', ')}</p>
                   <p><span className="label">КЛЮЧ:</span> {formData.key}</p>
                 </div>
               </div>
@@ -668,7 +432,26 @@ const RegisterWizard = () => {
               </button>
             </div>
           )}
+          
         </div>
+
+        <div className="login-link">
+  <p style={{ color: '#aa66ff', fontSize: '12px' }}>Уже есть аккаунт?</p>
+  <button 
+    onClick={() => navigate('/login')}
+    style={{
+      background: 'transparent',
+      border: '2px solid #00ffaa',
+      borderRadius: '30px',
+      padding: '8px 24px',
+      color: '#00ffaa',
+      cursor: 'pointer',
+      fontFamily: 'inherit'
+    }}
+  >
+    🔑 ВОЙТИ
+  </button>
+</div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import FastReg from "./pages/FastReg";
 
 import "./pages/style.scss";
 import "./pages/profile.scss";
@@ -28,6 +29,9 @@ import MarketPlace from "./components/GalacticMarketPlace";
 import GalaxyProfile from "./components/GalaxyProfile";
 import StartPage from "./components/StartPage"
 import News from "./components/Posts"
+import OriginReader from "./components/OriginReader";
+import Origins from "./components/Origins";
+import ArtCard from "./components/ArtCard";
 
 // function App() {
 
@@ -65,6 +69,7 @@ function App() {
           />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="fastreg" element={<FastReg />} />
           <Route path="/home/" element={<Home/>} />
           <Route path="/galaxy/" element={<GalaxyProfile/>} />
           {/* <Route path="/article/:id" element={<Article/>} /> */}
@@ -77,6 +82,9 @@ function App() {
           <Route path="/marketplace/" element={<MarketPlace/>} />
           <Route path="/messenger/" element={<Messenger/>} />
           <Route path="/finder/" element={<Finder/>} />
+          <Route path="/origin/:channelId" element={<OriginReader />} />
+          <Route path="/origins/" element={<Origins />} />
+          <Route path="/artcard/:artcardId" element={<ArtCard />} />
 
         </Route>
       </Routes>

@@ -1,0 +1,1138 @@
+@import '../pages/variables.scss';
+
+.origin-reader {
+  position: absolute;
+  width: 100%;
+  min-height: 100%;
+  background: $dark-bg;
+  font-family: 'Share Tech Mono', monospace;
+  padding: 20px; 
+  padding-bottom: 80px; // Добавить отступ для нижней панели
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
+    animation: scanline 3s linear infinite;
+    pointer-events: none;
+  }
+  
+  // Добавить класс для режимов
+  &.mode-active {
+    .origin-content {
+      padding: 0;
+    }
+  }
+}
+
+// Умный хэдэр
+// Умный хэдэр
+.smart-header {
+  position: sticky;
+  top: 0; max-width: 800px;
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid $neon-purple;
+  border-radius: 16px 16px 0 0;
+  margin-bottom: 20px;
+  z-index: 100;
+  transition: all 0.3s ease;
+  
+  .header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  
+  .header-left {
+    flex-shrink: 0;
+  }
+  
+  .header-icon {
+    background: transparent;
+    border: 2px solid $neon-green;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: $neon-green;
+    
+    &:hover {
+      background: $neon-green;
+      color: $dark-bg;
+      box-shadow: 0 0 20px $neon-green;
+      transform: scale(1.05);
+    }
+  }
+  
+  .channel-header-compact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    
+    .channel-avatar-compact {
+      width: 44px;
+      height: 44px;
+      background: rgba(0,255,255,0.2);
+      border: 2px solid $neon-green;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+        transform: scale(1.05);
+        border-color: $neon-pink;
+      }
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      span {
+        font-size: 24px;
+      }
+    }
+    
+    .channel-info-compact {
+      .channel-name {
+        color: $neon-pink;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+        text-shadow: 0 0 5px $neon-pink;
+      }
+      
+      .channel-meta {
+        font-size: 11px;
+        color: $neon-purple;
+        display: flex;
+        gap: 12px;
+        
+        span:first-child {
+          color: $neon-green;
+        }
+      }
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    
+    .share-btn-header,
+    .subscribe-btn-header {
+      background: transparent;
+      border: 2px solid $neon-purple;
+      border-radius: 5px;
+      font-size: 26px;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: all 0.2s;
+      color: $neon-purple;
+      
+      &:hover {
+        border-color: $neon-pink;
+        color: $neon-pink;
+        box-shadow: 0 0 10px $neon-pink;
+      }
+    }
+    
+    .subscribe-btn-header.subscribed {
+      border-color: $neon-green;
+      color: $neon-green;
+      // font-size: 25px; padding: 0px 7px;
+      
+      &:hover {
+        background: $neon-green;
+        color: $dark-bg;
+      }
+    }
+  }
+  
+  // Блок подписок (по клику на 👤)
+  .header-expandable {
+    max-height: 0;
+    overflow: hidden;
+    transition: 0.3s ease;
+    // transition: max-height 0.3s ease;
+    padding: 0px;
+    
+    &.show {
+      max-height: 300px;
+      padding: 10px;
+      border-top: 1px solid $neon-purple;
+      background: rgba(0,0,0,0.5);
+    }
+  }
+  
+  // Блок статистики (по клику на аватарку)
+  .stats-expandable {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    
+    &.show {
+      max-height: 500px;
+      padding: 10px;
+      border-top: 1px solid $neon-purple;
+      background: rgba(0,0,0,0.5);
+    }
+  }
+  
+  .subscriptions-section {
+    margin-bottom: 1px;
+    
+    .subscriptions-label {
+      font-size: 11px;
+      color: $neon-green;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .subscriptions-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      
+      &::-webkit-scrollbar {
+        height: 4px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(255,0,255,0.2);
+        border-radius: 2px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: $neon-purple;
+        border-radius: 2px;
+      }
+    }
+    
+    .subscription-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      
+      &:hover {
+        
+        .subscription-name {
+          color: $neon-pink;
+          text-shadow: 0 0 5px $neon-pink;
+        }
+      }
+      
+      .subscription-avatar {
+        width: 52px;
+        height: 52px;
+        background: rgba(0,255,255,0.1);
+        border: 2px solid $neon-green;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        overflow: hidden;
+        
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      
+      .subscription-name {
+        font-size: 10px;
+        max-width: 64px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $neon-green;
+      }
+    }
+    
+    .subscriptions-empty,
+    .subscriptions-loading {
+      font-size: 12px;
+      color: $neon-purple;
+      padding: 12px;
+      text-align: center;
+    }
+  }
+  
+  .search-expanded {
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    padding-bottom: 10px;
+    
+    .search-input-expanded {
+      flex: 1;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid $neon-purple;
+      border-radius: 10px;
+      padding: 10px 15px;
+      color: $neon-green;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      
+      &:focus {
+        outline: none;
+        border-color: $neon-pink;
+        box-shadow: 0 0 20px $neon-pink;
+      }
+      
+      &::placeholder {
+        color: #666;
+      }
+    }
+    
+    .search-btn-expanded {
+      width: 44px;
+      background: transparent;
+      border: 2px solid $neon-pink;
+      border-radius: 10px;
+      color: $neon-pink;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: $neon-pink;
+        color: $dark-bg;
+        box-shadow: 0 0 20px $neon-pink;
+      }
+    }
+  }
+  
+  .stats-section {
+    margin-bottom: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed rgba(255,0,255,0.3);
+    
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 16px;
+      
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        
+        .stat-icon {
+          font-size: 24px;
+        }
+        
+        .stat-value {
+          font-size: 20px;
+          font-weight: bold;
+          color: $neon-green;
+          text-shadow: 0 0 5px $neon-green;
+        }
+        
+        .stat-label {
+          font-size: 10px;
+          color: $neon-purple;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .share-btn-header,
+    .subscribe-btn-header {
+      background: transparent;
+      border: 2px solid $neon-purple;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: all 0.2s;
+      color: $neon-purple;
+      
+      &:hover {
+        border-color: $neon-pink;
+        color: $neon-pink;
+        box-shadow: 0 0 10px $neon-pink;
+      }
+    }
+      }
+    }
+  }
+  
+  .posts-list-compact {
+    .posts-list-label {
+      font-size: 11px;
+      color: $neon-green;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .posts-list-scroll {
+      max-height: 200px;
+      overflow-y: auto;
+      
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(255,0,255,0.2);
+        border-radius: 2px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: $neon-purple;
+        border-radius: 2px;
+      }
+    }
+    
+    .post-item-compact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin: 0px 0;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(0,255,255,0.1);
+        transform: translateX(4px);
+        
+        .post-title-compact {
+          color: $neon-pink;
+        }
+      }
+      
+      .post-bullet {
+        color: $neon-green;
+        font-size: 14px;
+      }
+      
+      .post-title-compact {
+        flex: 1;
+        font-size: 13px;
+        color: #ccc;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+  
+  .no-posts-message {
+    text-align: center;
+    padding: 20px;
+    color: $neon-purple;
+    font-size: 12px;
+  }
+}
+
+.channel-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(10,10,15,0.8);
+  // backdrop-filter: blur(10px);
+  border: 2px solid $neon-blue;
+  box-shadow: inset 0 0 18px $neon-blue;
+  background-color: rgba(0, 255, 255, 0.058);
+  border-radius: 20px;
+  padding: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  max-width: 480px;
+
+  .channel-avatar {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    background: rgba(0,255,255,0.2);
+    border: 2px solid $neon-green;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    span {
+      font-size: 32px;
+    }
+  }
+
+  .channel-info {
+    flex: 1;
+    min-width: 0;
+
+    .channel-name {
+      color: $neon-pink;
+      font-size: 24px;
+      margin: 0 0 5px;
+      text-shadow: 0 0 10px $neon-pink;
+      word-break: break-word;
+    }
+
+    .channel-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+
+      .channel-author {
+        color: $neon-green;
+      }
+      .channel-stats {
+        color: $neon-purple;
+      }
+    }
+  }
+
+  .subscribe-btn {
+    padding: 10px 10px;
+    background: transparent;
+    border: 2px solid $neon-green;
+    border-radius: 30px;
+    color: $neon-green;
+    // font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background: $neon-green;
+      color: $dark-bg;
+      box-shadow: 0 0 20px $neon-green;
+    }
+
+    &.subscribed {
+      border-color: $neon-pink;
+      color: $neon-pink;
+      &:hover {
+        background: $neon-pink;
+        color: $dark-bg;
+      }
+    }
+  }
+}
+
+.search-section {
+    display: flex;
+    gap: 10px;
+    max-width: 500px;
+    width: 100%;
+    margin: 10px auto 10px auto;
+    padding: 0;
+  
+    .search-input {
+      flex: 1;
+      height: 48px;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid $neon-purple;
+      border-radius: 10px;
+      padding: 0 15px;
+      color: $neon-green;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 16px;
+      padding-left: 45px; 
+  
+      &:focus {
+        outline: none;
+        border-color: $neon-pink;
+        box-shadow: 0 0 20px $neon-pink;
+      }
+    }
+  
+    .search-btn {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border: 2px solid $neon-pink;
+      border-radius: 10px;
+      color: $neon-pink;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+  
+      &:hover {
+        background: $neon-pink;
+        color: $dark-bg;
+        box-shadow: 0 0 20px $neon-pink;
+      }
+    }
+  }
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 500px;
+  padding-right: 40px;
+}
+
+.post-card {
+  background: rgba(1, 1, 30, 0.13);
+  border: 2px solid $neon-purple;
+  // box-shadow: inset 0 0 18px $neon-purple;
+  background-color: rgba(149, 0, 255, 0.075);
+  border-radius: 10px;
+  padding: 15px; padding-left: 20px;
+  transition: all 0.3s ease;
+//   margin-bottom: 10px;
+
+  &:hover {
+    border-color: $neon-pink;
+    transform: translateX(5px);
+  }
+}
+
+.post-title {
+  color: $neon-blue;
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-shadow: 0 0 5px $neon-blue;
+}
+
+.post-text {
+  color: white;
+  // background-color: rgba(255, 255, 255, 0.107);
+  font-size: 16px;
+  line-height: 1.2;
+  margin-bottom: 15px;
+  // border: dashed 1px rgba(255, 255, 255, 0.085);
+  white-space: pre-wrap;
+}
+
+.post-meta {
+  display: flex;
+  gap: 15px;
+  color: $neon-purple;
+  font-size: 12px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  // border-bottom: 1px solid rgba(255,0,255,0.2);
+}
+
+.comments-section {
+  margin-top: 15px;
+  padding-top: 10px;
+  // border-top: 1px solid rgba(0,255,255,0.2);
+
+  .toggle-comments {
+    background: transparent;
+    border: none;
+    color: $neon-green;
+    font-family: 'Share Tech Mono', monospace;
+    cursor: pointer;
+    padding: 5px 0;
+    margin-bottom: 10px;
+
+    &:hover {
+      text-shadow: 0 0 5px $neon-green;
+    }
+  }
+
+  .comment-input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    display: none;
+
+    &.show {
+      display: flex;
+    }
+
+    input {
+      flex: 1;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid $neon-purple;
+      border-radius: 20px;
+      padding: 8px 15px;
+      color: white;
+      font-family: 'Share Tech Mono', monospace;
+
+      &:focus {
+        outline: none;
+        border-color: $neon-pink;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+
+    button {
+      background: transparent;
+      border: 2px solid $neon-green;
+      border-radius: 20px;
+      padding: 5px 15px;
+      color: $neon-green;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: $neon-green;
+        color: $dark-bg;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.comment-item {
+  background: rgba(0,0,0,0.3);
+  border: 1px dashed $neon-purple;
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  .comment-author {
+    color: $neon-green;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .comment-text {
+    color: white;
+    font-size: 14px;
+  }
+}
+
+.empty-state, .empty-posts {
+  text-align: center;
+  padding: 50px;
+  color: $neon-purple;
+
+  h3 {
+    color: $neon-pink;
+    margin-bottom: 10px;
+  }
+
+  button {
+    margin-top: 20px;
+  }
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+  
+    button {
+      flex: 1;
+      max-width: 200px;
+      padding: 10px 20px;
+      background: transparent;
+      border: 2px solid $neon-purple;
+      border-radius: 30px;
+      color: $neon-purple;
+      font-family: 'Share Tech Mono', monospace;
+      cursor: pointer;
+      transition: all 0.3s ease;
+  
+      &:hover {
+        border-color: $neon-pink;
+        color: $neon-pink;
+      }
+    }
+  
+    .back-btn:hover {
+      transform: translateX(-5px);
+    }
+  
+    .share-btn:hover {
+      transform: translateX(5px);
+    }
+  }
+  
+// .back-btn {
+//   margin-top: 30px;
+//   padding: 10px 20px;
+//   background: transparent;
+//   border: 2px solid $neon-purple;
+//   border-radius: 30px;
+//   color: $neon-purple;
+//   font-family: 'Share Tech Mono', monospace;
+//   cursor: pointer;
+//   transition: all 0.3s ease;
+
+//   &:hover {
+//     border-color: $neon-pink;
+//     color: $neon-pink;
+//     transform: translateX(-5px);
+//   }
+// }
+
+// .action-buttons {
+//     display: flex;
+//     gap: 15px;
+//     justify-content: center;
+//     margin-top: 30px;
+  
+//     .back-btn, .share-btn {
+//       padding: 10px 20px;
+//       background: transparent;
+//       border: 2px solid $neon-purple;
+//       border-radius: 30px;
+//       color: $neon-purple;
+//       font-family: 'Share Tech Mono', monospace;
+//       cursor: pointer;
+//       transition: all 0.3s ease;
+  
+//       &:hover {
+//         border-color: $neon-pink;
+//         color: $neon-pink;
+//         transform: translateX(-5px);
+//       }
+//     }
+  
+//     .share-btn:hover {
+//       transform: translateX(5px);
+//     }
+//   }
+
+.loader {
+  text-align: center;
+  padding: 50px;
+  color: $neon-green;
+  font-size: 24px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  .origin-reader {
+    padding: 10px;
+    padding-bottom: 70px;
+  }
+  
+  .channel-header {
+    .channel-avatar {
+      width: 50px;
+      height: 50px;
+    }
+    .channel-name {
+      font-size: 18px;
+    }
+  }
+  
+  // // Добавить адаптив для режимов
+  // .gala-mode {
+  //   &.grid-3x3,
+  //   &.grid-4x4 {
+  //     grid-template-columns: repeat(2, 1fr);
+  //   }
+  // }
+  
+  .bottom-bar .bottom-buttons .bottom-nav-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  
+  .smart-header {
+    .channel-header-compact .channel-info-compact .channel-name {
+      font-size: 14px;
+    }
+    
+    .header-actions .share-btn-header,
+    .header-actions .subscribe-btn-header {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+  }
+}
+
+// @media (max-width: 768px) {
+//   .origin-reader {
+//     padding: 10px; padding-right: 15px;
+//   }
+
+//   .channel-header {
+//     .channel-avatar {
+//       width: 50px;
+//       height: 50px;
+//     }
+//     .channel-name {
+//       font-size: 18px;
+//     }
+//   }
+// }
+
+
+
+
+.list-mode {
+  padding: 12px;
+  max-width: 100%;
+  
+  .list-mode-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(10,10,15,0.8);
+    border: 2px solid $neon-purple;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(0,255,255,0.1);
+      border-color: $neon-green;
+      transform: translateX(5px);
+    }
+    
+    .list-mode-avatar {
+      width: 56px;
+      height: 56px;
+      background: rgba(0,255,255,0.1);
+      border: 2px solid $neon-green;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .list-mode-info {
+      flex: 1;
+      
+      .list-mode-name {
+        font-weight: 600;
+        font-size: 16px;
+        color: $neon-pink;
+        margin-bottom: 4px;
+      }
+      
+      .list-mode-author {
+        font-size: 11px;
+        color: $neon-green;
+        margin-bottom: 8px;
+      }
+      
+      .list-mode-last-post {
+        font-size: 12px;
+        color: #aaa;
+        line-height: 1.4;
+      }
+      
+      .list-mode-no-posts {
+        font-size: 11px;
+        color: $neon-purple;
+      }
+    }
+  }
+}
+
+.empty-subscriptions {
+  text-align: center;
+  padding: 60px 20px;
+  color: $neon-purple;
+  
+  p {
+    margin-bottom: 20px;
+  }
+  
+  .btn-primary {
+    background: transparent;
+    border: 2px solid $neon-green;
+    border-radius: 30px;
+    padding: 10px 24px;
+    color: $neon-green;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: $neon-green;
+      color: $dark-bg;
+      box-shadow: 0 0 20px $neon-green;
+    }
+  }
+}
+
+
+// Нижняя панель
+.bottom-bar {
+  position: fixed;
+  bottom: 0; 
+
+  max-width: 800px;
+  width: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 2px solid $neon-purple;
+  z-index: 100;
+  
+  .bottom-expandable {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    
+    &.show {
+      max-height: 80px;
+      padding: 12px 16px;
+      border-bottom: 1px solid $neon-purple;
+    }
+  }
+  
+  .command-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid $neon-purple;
+    border-radius: 30px;
+    padding: 4px 16px;
+    
+    .command-prompt {
+      color: $neon-green;
+      font-family: monospace;
+      font-size: 16px;
+    }
+    
+    .command-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: $neon-green;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      padding: 10px 0;
+      
+      &:focus {
+        outline: none;
+      }
+      
+      &::placeholder {
+        color: #444;
+        font-family: monospace;
+      }
+    }
+  }
+  
+  .bottom-buttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 16px;
+    position: relative;
+    
+    .expand-btn {
+      position: relative;
+      // left: 16px; bottom: 50px;
+      background: transparent;
+      border: 2px solid $neon-green;
+      border-radius: 50%;
+      color: $neon-green;
+      font-size: 18px;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: $neon-green;
+        color: $dark-bg;
+        box-shadow: 0 0 15px $neon-green;
+      }
+    }
+    
+    .bottom-nav-btn {
+      background: transparent;
+      border: none;
+      color: $neon-purple;
+      font-size: 13px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      
+      &:hover {
+        color: $neon-pink;
+        text-shadow: 0 0 5px $neon-pink;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+.origin-content {
+  transition: all 0.3s ease;
+}

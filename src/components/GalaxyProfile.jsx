@@ -6,7 +6,7 @@ import {doc, getDoc, collection, query, where, orderBy, limit, onSnapshot } from
 import { db } from '../galaconfig';
 
 
-import SkyBox from './SkyBox';
+// import SkyBox from './SkyBox';
 import CommandTerminal from './CommandTerminal';
 import GalaxyMessages from './GalaxyMessages';
 import './GalaxyProfile.scss';
@@ -178,7 +178,7 @@ const GalaxyProfile = () => {
 
   return (
     <div className={`galaxy-profile ${profileMode}`}>
-      {/* <SkyBox /> */}
+
       <StarField />
 
 
@@ -261,9 +261,9 @@ const GalaxyProfile = () => {
         </div>
 )}
 
-<button onClick={() => setShowMessages(true)} className="messages-btn">
+{/* <button onClick={() => setShowMessages(true)} className="messages-btn">
   📩 {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
-</button>
+</button> */}
 
       {/* Инструменты */}
       <div className="info-section">
@@ -300,7 +300,35 @@ const GalaxyProfile = () => {
         />
       </div>
 
-        <div className="profile-footer">
+      <div className="action-bar">
+        <button className="action-btn messages" onClick={() => setShowMessages(true)}>
+          📩 {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
+        </button>
+        
+        <button className="action-btn show-key" onClick={showKey}>
+          🔑
+        </button>
+        
+        <button className="action-btn minimize" onClick={() => setIsMinimized(true)}>
+          ▲ 
+        </button>
+        
+        <button className="action-btn logout" onClick={logout}>
+          🔚
+        </button>
+      </div>
+
+      {showVisualKey && (
+        <div className="visual-key-mini">
+          <canvas id="visualKey" className="visual-key-small" />
+          <div className="key-controls">
+            <button onClick={downloadVisualKey} className="key-btn download">💾</button>
+            <button onClick={() => setShowVisualKey(false)} className="key-btn close">✕</button>
+          </div>
+        </div>
+      )}
+
+        {/* <div className="profile-footer">
 
           <button className="show-key-btn" onClick={showKey}>
           🔑 ПОКАЗАТЬ КЛЮЧ
@@ -316,12 +344,6 @@ const GalaxyProfile = () => {
             </div>
           )}
 
-          {/* {showVisualKey && (
-          <div className="visual-key-mini">
-            <canvas id="visualKey" className="visual-key-small" />
-          </div>
-          )} */}
-
           <button 
           className="logout-btn"
           onClick={() => {
@@ -333,7 +355,7 @@ const GalaxyProfile = () => {
           🔚
           </button>
 
-        </div>
+        </div> */}
 
       {/* <div className="visual-key-section">
         <h3>🔑 ВИЗУАЛЬНЫЙ КЛЮЧ</h3>
@@ -345,12 +367,12 @@ const GalaxyProfile = () => {
 
     </div>
 
-    <button 
+    {/* <button 
   className="minimize-btn"
   onClick={() => setIsMinimized(true)}
 >
   ▲ СВЕРНУТЬ
-    </button>
+    </button> */}
 
     {/* <button 
       className="logout-btn"

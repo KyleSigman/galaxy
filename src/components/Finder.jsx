@@ -1,363 +1,207 @@
-import React , {useState, useEffect} from "react";
-import { Link} from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../firebase";
-import { collection, onSnapshot,  doc, getDoc, getDocs   } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { db } from "../galaconfig";
+import { collection, getDocs } from "firebase/firestore";
 import StarField from './StarField';
-import SkyBoxF from "../components/SkyBoxF";
-import finder from "../img/find.png"
-import drums from "../img/drm.png"
-import guitar from "../img/gtr.png"
-import bass from "../img/bss.png"
-import vocal from "../img/micc.jpg"
-import producer from "../img/pdcr.png"
-import fx from "../img/fx.png"
+import { Link } from "react-router-dom";
 
 const SearchPage = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [search, setSearch] = useState('');
+  const [selectedInstrument, setSelectedInstrument] = useState('');
+  const [searchField, setSearchField] = useState('all'); // all, id, style, instruments, favbands
+  const [expandedCards, setExpandedCards] = useState({});
 
-    const[blogs, Setblogs] = useState([]);
-    const[search, setSearch] = useState('');
-    const[Searchblogs, SetSearchblogs] = useState([]);
-    const [newName, setNewName] = useState("");
-    const [user] = useAuthState(auth);
+  const instruments = [
+    "барабаны", "перкуссия", "гитара", "бас", "вокал", "клавиши",
+    "сэмплер", "виола", "труба", "флейта", "скрипка", "контрабас",
+    "пианино", "джембе", "бубен", "треугольник", "аккордеон", "другое"
+  ];
 
-      // Состояние для выбранной опции
-    // const [selectedOption, setSelectedOption] = useState('option1');
-    const [selectedOption, setSelectedOption] = useState('');
+  const searchOptions = [
+    { value: 'all', label: 'везде' },
+    { value: 'id', label: 'по ID' },
+    { value: 'style', label: 'по стилю' },
+    { value: 'instruments', label: 'по инструментам' },
+    { value: 'favband', label: 'по группам' }
+  ];
 
-    useEffect(() => {
-        const articleRef = collection(db, "Regalias");
-        onSnapshot(articleRef, (querySnapshot) => {
-          const data = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          Setblogs(data);       
-        });
-      }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      const querySnapshot = await getDocs(collection(db, "artcards"));
+      const data = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setBlogs(data);
+    };
+    fetchData();
+  }, []);
 
-      useEffect(() => {
-        const fetchUserData = async () => {
-        try {
-        const userRef = doc(db, "users", user.id, "userinfo");
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-        const userInfo = docSnap.data();
-        const newName = userInfo?.NAME || "";
-        setNewName(newName);
-        }
-        } catch (error) {
-        console.error("Error fetching user data:", error);
-        }
-        };
-        fetchUserData();
-        }, [user]);
+  const handleInstrumentClick = (instrument) => {
+    if (selectedInstrument === instrument) {
+      setSelectedInstrument('');
+    } else {
+      setSelectedInstrument(instrument);
+    }
+  };
 
+  const toggleCard = (cardId) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [cardId]: !prev[cardId]
+    }));
+  };
 
+  const matchesSearchField = (blog, searchTerm) => {
+    const lowerTerm = searchTerm.toLowerCase();
+    
+    switch (searchField) {
+      case 'id':
+        return blog.artcardId?.toLowerCase() === lowerTerm;
+      case 'style':
+        return blog.style?.toLowerCase().includes(lowerTerm);
+      case 'instruments':
+        return blog.instruments?.some(inst => inst.toLowerCase().includes(lowerTerm));
+        case 'favband':
+          return blog.favband?.some(band => band.toLowerCase().includes(lowerTerm));
+        default: // 'all'
+        return (
+          (blog.artcardId && blog.artcardId.toLowerCase() === lowerTerm) ||
+          (blog.style && blog.style.toLowerCase().includes(lowerTerm)) ||
+          (blog.instruments && blog.instruments.some(inst => inst.toLowerCase().includes(lowerTerm))) ||
+          (blog.favband && blog.favband.some(band => band.toLowerCase().includes(lowerTerm)))
+        );
+    }
+  };
 
-useEffect(() => {
-  SearchBlog();
-}, [selectedOption, search]); // Добавьте `search` в зависимости
+  const filteredBlogs = blogs.filter(blog => {
+    const matchesSearch = !search ? true : matchesSearchField(blog, search);
+    const instrumentMatch = !selectedInstrument ? true : blog.instruments?.includes(selectedInstrument);
+    return matchesSearch && instrumentMatch;
+  });
 
-const SearchBlog = (e) => {
-  if (e) e.preventDefault(); // Предотвращаем перезагрузку страницы при отправке формы
+  const hasActiveFilters = search || selectedInstrument;
 
-  const lowerCaseSearch = search.toLowerCase().trim(); // Убираем лишние пробелы
+  const renderCardFields = (blog) => {
+    const fields = [
+      { label: "инструменты", value: blog.instruments?.length > 0 ? blog.instruments.join(", ") : null },
+      { label: "стаж", value: blog.experience ? `${blog.experience} лет` : null },
+      { label: "стиль", value: blog.style },
+      { label: "проекты", value: blog.projects?.length > 0 ? blog.projects.join(", ") : null },
+      { label: "любимые группы", value: blog.favband?.length > 0 ? blog.favband.join(", ") : null },
+      { label: "образование", value: blog.education },
+      { label: "эндорсмент", value: blog.endorsement },
+      { label: "оборудование", value: blog.gear },
+      { label: "любимая техника", value: blog.favTechnique },
+      { label: "сценический образ", value: blog.stageLook },
+      { label: "движение на сцене", value: blog.stageMovement },
+      { label: "творческий подход", value: blog.creativeApproach },
+      { label: "алкоголь", value: blog.alcohol },
+      { label: "коммуникация", value: blog.communication },
+      { label: "девиз", value: blog.motto },
+      { label: "телефон", value: blog.phone },
+      { label: "плюс один", value: blog.plusOne },
+      { label: "релизы", value: blog.releaseLinks },
+      { label: "статус", value: blog.status },
+      { label: "коммитмент", value: blog.commitment },
+      { label: "тикер", value: blog.ticker },
+      // { label: "готов к сотрудничеству", value: blog.ready ? "да" : "нет", isSpecial: true }
+    ];
 
-  // Если поле поиска пустое, сбрасываем результаты
-  if (!lowerCaseSearch && !selectedOption) {
-    SetSearchblogs([]); // Очищаем результаты
-    return;
-  }
+    return fields.map((field, idx) => {
+      if (!field.value) return null;
+      return (
+        <div className={`inset ${field.isSpecial ? 'ready' : ''}`} key={idx}>
+          <h2>{field.label}:</h2>
+          {field.value}
+        </div>
+      );
+    });
+  };
 
-  // Фильтрация по введенному слову и выбранной категории
-  SetSearchblogs(
-    blogs.filter((blog) => {
-      const matchesSelectedOption = selectedOption ? blog.selectedOption === selectedOption : true;
-      const matchesSearch =
-        blog.title.toLowerCase().includes(lowerCaseSearch) || 
-        blog.style.toLowerCase().includes(lowerCaseSearch) || 
-        blog.favband.toLowerCase().includes(lowerCaseSearch);
+  return (
+    <div className="Finder">
+      <StarField />
+      
+      <div className="search-section2">
+        <div className="search-form">
+          <input 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            placeholder="поиск..."
+          />
+        </div>
 
-      return matchesSelectedOption && matchesSearch;
-    })
+        <div className="search-options">
+          {searchOptions.map(option => (
+            <div
+              key={option.value}
+              className={`search-option-chip ${searchField === option.value ? 'active' : ''}`}
+              onClick={() => setSearchField(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+
+        <div className="instruments-grid">
+          {instruments.map(instrument => (
+            <div
+              key={instrument}
+              className={`instrument-chip ${selectedInstrument === instrument ? 'active' : ''}`}
+              onClick={() => handleInstrumentClick(instrument)}
+            >
+              {instrument}
+            </div>
+          ))}
+        </div>
+
+        {selectedInstrument && (
+          <button onClick={() => setSelectedInstrument('')} className="reset-btn">
+            ✕ сбросить фильтр инструмента
+          </button>
+        )}
+      </div>
+
+      <div className="Regaliascontent">
+        {!hasActiveFilters ? (
+          <p className="info-message">
+            введите запрос или выберите инструмент
+          </p>
+        ) : filteredBlogs.length === 0 ? (
+          <p className="info-message">
+            ничего не найдено
+          </p>
+        ) : (
+          filteredBlogs.map(blog => {
+            const isExpanded = expandedCards[blog.id];
+            return (
+              <div className="regaliacontent" key={blog.id}>
+                <div className="card-header">
+                  <div className="nick inset card-id">{blog.artcardId || blog.id}</div>
+                  <div className="expand-btn" onClick={() => toggleCard(blog.id)}>
+                    {isExpanded ? "▼" : "▶"}
+                  </div>
+                </div>
+                
+                {isExpanded && (
+                  <div className="card-full-content">
+                    {renderCardFields(blog)}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <div className="finderhome">
+        <Link to="/galaxy/">
+          <img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" alt="" />
+        </Link>
+      </div>
+    </div>
   );
 };
 
-    return(
-        <div className="Finder">
-<StarField />
-
-            <div>
-                <form 
-                onSubmit={(e) => {SearchBlog(e)}}
-                >
-                      <input
-        onChange={(e) => {
-            setSearch(e.target.value); // Обновляем состояние
-            SearchBlog(e); // Вызываем функцию поиска
-        }}
-    />
-                    
-                </form>
-
-                <div className="radio">
-  <label>
-    <span style={{fontSize: '32px'}}>😈</span>
-    <input
-      type="radio"
-      value="option1"
-      checked={selectedOption === 'option1'}
-      onChange={(e) => { 
-        setSelectedOption(e.target.value);
-        SearchBlog(e);
-      }}
-    />
-  </label>
-  <label>
-    <span style={{fontSize: '32px'}}>🎸</span>
-    <input
-      type="radio"
-      value="option2"
-      checked={selectedOption === 'option2'}
-      onChange={(e) => {
-        setSelectedOption(e.target.value);
-        SearchBlog(e);
-      }}
-    />
-  </label>
-  <label>
-    <span style={{fontSize: '32px'}}>🎸</span>
-    <input
-      type="radio"
-      value="option3"
-      checked={selectedOption === 'option3'}
-      onChange={(e) => {
-        setSelectedOption(e.target.value);
-        SearchBlog(e);
-      }}
-    />
-  </label>
-  <label>
-    <span style={{fontSize: '32px'}}>🎤</span>
-    <input
-      type="radio"
-      value="option4"
-      checked={selectedOption === 'option4'}
-      onChange={(e) => {
-        setSelectedOption(e.target.value);
-        SearchBlog(e);
-      }}
-    />
-  </label>
-  <label>
-    <span style={{fontSize: '32px'}}>🎧</span>
-    <input
-      type="radio"
-      value="option5"
-      checked={selectedOption === 'option5'}
-      onChange={(e) => {
-        setSelectedOption(e.target.value);
-        SearchBlog(e);
-      }}
-    />
-  </label>
-  <label>
-    <span style={{fontSize: '32px'}}>😎</span>
-    <input
-      type="radio"
-      value="option6"
-      checked={selectedOption === 'option6'}
-      onChange={(e) => {
-        setSelectedOption(e.target.value);
-        SearchBlog(e);
-      }}
-    />
-  </label>
-</div>
-
-                {/* <div className="radio">
-    <label>
-        <img src={drums} alt="" />
-        <input
-            type="radio"
-            value="option1"
-            checked={selectedOption === 'option1'}
-            onChange={(e) => { 
-                setSelectedOption(e.target.value);
-                SearchBlog(e); // вызов функции поиска
-            }}
-        />
-    </label>
-    <label>
-        <img src={guitar} alt="" />
-        <input
-            type="radio"
-            value="option2"
-            checked={selectedOption === 'option2'}
-            onChange={(e) => {
-                setSelectedOption(e.target.value);
-                SearchBlog(e); // вызов функции поиска
-            }}
-        />
-    </label>
-    <label>
-        <img src={bass} alt="" />
-        <input
-            type="radio"
-            value="option3"
-            checked={selectedOption === 'option3'}
-            onChange={(e) => {
-                setSelectedOption(e.target.value);
-                SearchBlog(e); // вызов функции поиска
-            }}
-        />
-    </label>
-    <label>
-        <img src={vocal} alt="" />
-        <input
-            type="radio"
-            value="option4"
-            checked={selectedOption === 'option4'}
-            onChange={(e) => {
-                setSelectedOption(e.target.value);
-                SearchBlog(e); // вызов функции поиска
-            }}
-        />
-    </label>
-    <label>
-        <img src={fx} alt="" />
-        <input
-            type="radio"
-            value="option5"
-            checked={selectedOption === 'option5'}
-            onChange={(e) => {
-                setSelectedOption(e.target.value);
-                SearchBlog(e); // вызов функции поиска
-            }}
-        />
-    </label>
-    <label>
-        <img src={producer} alt="" />
-        <input
-            type="radio"
-            value="option6"
-            checked={selectedOption === 'option6'}
-            onChange={(e) => {
-                setSelectedOption(e.target.value);
-                SearchBlog(e); // вызов функции поиска
-            }}
-        />
-    </label>
-                </div> */}
-
-            </div>
-
-            <div className="Regaliascontent">
-
-            {Searchblogs.length === 0 ? (
-            <p></p>
-            ) : (
-            Searchblogs.map(
-          ({
-            id,
-            title,
-            exp,
-            style,
-            price,
-            band,
-            actualband,
-            favband,
-            support,
-            message,
-            state,
-            description,
-            imageUrl,
-            createdAt,
-            createdBy,
-            userId,
-            ready,
-            likes,
-            comments,
-            // followers,
-          }) => (
-            <div className="regaliacontent">
-                
-                {/* <Link to={`/vocancy/${id}`}>
-                </Link> */}
-
-                  {/* <Link to={`/guest/${userId}`}>
-                  <div className="imgshell">
-                  <img className="vocimg" src={imageUrl} alt="title" />
-                </div>
-                </Link> */}
-                
-                
-              <div className="regalia" key={id}>
-              <Link to={`/visitka/${userId}`}>
-              {createdBy && 
-              (<div className="nick inset">
-
-              {createdBy}
-              </div>)}
-
-                </Link>
-                  
-                  <div className="regaliatittle inset">
-                  <h2>специальность:</h2>
-                  {title}</div>
-                  <div className="regaliaexp inset">
-                  <h2>стаж:</h2>
-                  {exp}</div>
-                  <div className="regaliastyle inset">
-                  <h2>стиль:</h2>
-                  {style}</div>
-                  <div className="regaliaactualband inset">
-                  <h2>основной проект:</h2>
-                    {actualband}</div>
-                  <div className="regaliabands inset">
-                  <h2>проекты:</h2>
-                    {band}</div>
-                    <div className="regaliasupport inset">
-                  <h2>разогрев:</h2>
-                    {support}</div>
-
-                  <div className="regprice inset">
-                    <h2>прайс лист: </h2>
-                    {price}</div>
-                    <div className="regfavband inset">
-                    <h2>фавориты: </h2>
-                    {favband}</div>
-                    <div className="regmessage inset">
-                    <h2>промо: </h2>
-                    {message}</div>
-                    <div id="p_wrap" className="regtext inset">
-                    <h2>ссылки на тг:</h2>
-                    {description}</div>
-                    <div className="regstate inset">
-                    <h2>статус: </h2>
-                    {state}</div>
-                    <div className="ready inset">
-                      {ready}
-                    </div>
-
-              </div>
-              
-            </div>
-            
-          )
-        )
-      )}
-            </div>
-
-      <div className="finderhome">
-        <Link style={{ textDecoration: 'none', color: 'white' }} to="/galaxy/">
-      <img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" alt="" />
-          </Link>
-      </div>
-
-        </div>
-    );
-};
 export default SearchPage;
-
