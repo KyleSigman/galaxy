@@ -31,7 +31,7 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
     '@@login': { path: '/login', desc: 'авторизоваться' },
     '@@st': { path: '/startpage', desc: 'Стартовая страница' },
     '@@pf': { path: '/galaxy/', desc: 'Твой профиль' },
-    '@@artcard': { path: null, desc: '@@artcard abcdef — открыть визитку по ID' },
+    '@@art': { path: null, desc: '@@art abcdef — открыть визитку по ID' },
     '@@find': { path: '/finder/', desc: 'Твой профиль' },
     '@@cyberchat': { path: '/messenger', desc: 'Мессенджер' },
     '@@mk': { path: '/market', desc: 'продавать' },
@@ -39,6 +39,7 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
     '@@postvid': { path: null, desc: 'Опубликовать видео дня' },
     '@@news': { path: '/news', desc: 'лента' },
     '@@origin': { path: null, desc: '@@origin XK79P2 — открыть канал по ID' },
+    '@@origins': { path: '/origins', desc: 'каналы' },
     '@@getnews': { path: null, desc: 'Показать свежие видео' },
     '@@help': { path: null, desc: 'Показать все команды' },
     '@@send': { path: null, desc: 'Отправить личное сообщение (пример: @@sendto KateDark привет)' },
@@ -149,12 +150,12 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
       const originId = cmd.replace('@@origin ', '').trim();
       navigate(`/origin/${originId}`);
     }
-    else if (cmd.startsWith('@@artcard ')) {
-      const artcardId = cmd.replace('@@artcard ', '').trim();
+    else if (cmd.startsWith('@@art ')) {
+      const artcardId = cmd.replace('@@art ', '').trim();
       if (artcardId) {
         navigate(`/artcard/${artcardId}`);
       } else {
-        setMessage({ type: 'error', text: 'Укажи ID визитки: @@artcard abcdef' });
+        setMessage({ type: 'error', text: 'Укажи ID визитки: @@art abcdef' });
       }
     }
     else {
