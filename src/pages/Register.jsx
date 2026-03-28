@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { db } from '../galaconfig';
 import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import SkyBoxR from "../components/SkyBoxR";
+import StarField from '../components/StarField';
 import './RegisterWizard.scss';
 
 const RegisterWizard = () => {
@@ -437,7 +437,7 @@ const RegisterWizard = () => {
 
   return (
     <div className="register-wizard">
-      <SkyBoxR />
+      <StarField />
       
       <div className="wizard-container">
         <div className="wizard-header">
