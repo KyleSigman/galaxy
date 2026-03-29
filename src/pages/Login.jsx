@@ -101,7 +101,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../galaconfig";
-import SkyBoxR from "../components/SkyBoxR";
+import StarField from '../components/StarField';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import "./Login.scss";
 
@@ -262,8 +262,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <SkyBoxR />
-      
+      <StarField />
       <div className="terminal-login">
         <div className="terminal-header">
           <span className="terminal-title">✦ ВХОД В STARFIELD ✦</span>
