@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { db } from '../galaconfig';
 import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import SkyBoxR from "../components/SkyBoxR";
+import StarField from '../components/StarField';
+// import SkyBoxR from "../components/SkyBoxR";
 import './RegisterWizard.scss';
 
 const RegisterWizard = () => {
@@ -273,8 +274,8 @@ const RegisterWizard = () => {
 
   return (
     <div className="register-wizard">
-      <SkyBoxR />
-      
+      {/* <SkyBoxR /> */}
+      <StarField />
       <div className="wizard-container">
         <div className="wizard-header">
           <h1>✦ РЕГИСТРАЦИЯ ✦</h1>
@@ -304,7 +305,7 @@ const RegisterWizard = () => {
           {/* Шаг 2: Galaxy Name */}
           {step === 2 && (
             <div className="step-galaxyname">
-              <h3>ВВЕДИ GALAXY NAME</h3>
+              <h3>ВВЕДИ ИМЯ</h3>
               <p>он будет отображаться как @{formData.galaxyName || 'имя'}</p>
               
               <input
@@ -431,7 +432,26 @@ const RegisterWizard = () => {
               </button>
             </div>
           )}
+          
         </div>
+
+        <div className="login-link">
+  <p style={{ color: '#aa66ff', fontSize: '12px' }}>Уже есть аккаунт?</p>
+  <button 
+    onClick={() => navigate('/login')}
+    style={{
+      background: 'transparent',
+      border: '2px solid #00ffaa',
+      borderRadius: '30px',
+      padding: '8px 24px',
+      color: '#00ffaa',
+      cursor: 'pointer',
+      fontFamily: 'inherit'
+    }}
+  >
+    🔑 ВОЙТИ
+  </button>
+</div>
       </div>
     </div>
   );
