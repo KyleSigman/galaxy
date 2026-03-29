@@ -233,13 +233,14 @@
 .terminal-section {
   position: relative;
   width: 100%;
+  display: flex;
+  justify-content: center;
   z-index: 2;
-
 }
 
 .command-terminal {
   position: relative;
-  width: 100%;
+  max-width: 660px;
   font-family: 'Share Tech Mono', 'Courier New', monospace;
 
   .terminal-container {
@@ -248,7 +249,7 @@
     box-sizing: border-box;
     background: rgba(0, 0, 0, 0.503);
     border: 2px solid $neon-pink;
-    border-radius: 10px;
+    border-radius: 100px;
     box-shadow: 0 0 30px rgba(255, 0, 255, 0.5),
                 inset 0 0 20px rgba(255, 0, 255, 0.2);
     animation: terminalPulse 2s infinite;
@@ -279,7 +280,7 @@
       outline: none;
       padding-left: 25px;
       letter-spacing: 1px;
-      border-radius: 8px;
+      border-radius: 100px;
 
       &::placeholder {
         color: rgba(0, 255, 255, 0.3);
