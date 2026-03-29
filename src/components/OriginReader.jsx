@@ -659,11 +659,11 @@ const scrollToPost = (postId) => {
         </div>
         
         <div className="bottom-buttons">
-          <button className="expand-btn"
+          {/* <button className="expand-btn"
             onClick={() => setIsBottomExpanded(!isBottomExpanded)}
           >
             {isBottomExpanded ? '⌃' : '⌄'}
-          </button>
+          </button> */}
           
           <button className="bottom-nav-btn" onClick={() => {
             setDisplayMode('posts');
@@ -672,10 +672,14 @@ const scrollToPost = (postId) => {
           }}>
             🏠 ГЛАВНАЯ
           </button>
-          
-          <button className="bottom-nav-btn" onClick={handleCreateOrigin}>
-            ➕ СОЗДАТЬ
+
+          <button className="bottom-nav-btn" onClick={() => navigate('/origins')}>
+            🌌 КАНАЛЫ
           </button>
+          
+          {/* <button className="bottom-nav-btn" onClick={handleCreateOrigin}>
+            ➕ СОЗДАТЬ
+          </button> */}
           
           <button className="bottom-nav-btn" onClick={() => navigate('/fastreg')}>
             📝 ВОЙТИ
