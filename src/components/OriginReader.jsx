@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc, setDoc, arrayUnion, arrayRemove, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../galaconfig';
 import './OriginReader.scss';
+import galaEngine from './galaEngine';
 
 const OriginReader = () => {
   const { channelId } = useParams();
@@ -164,7 +165,20 @@ const [isStatsExpanded, setIsStatsExpanded] = useState(false);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isHeaderExpanded]);
 
+  useEffect(() => {
+    // Обработка variant
+    document.querySelectorAll('.variant-word').forEach(el => {
+      el.addEventListener('click', function(e) {
+        const variant = this.dataset.variant;
+        if (variant) {
+          const [word1, word2] = variant.split('|');
+          this.innerText = this.innerText === word1 ? word2 : word1;
+        }
+      });
+    });
+  }, [channel]); // или после обновления постов
   // Подписка/отписка
+
   const toggleSubscribe = async () => {
     if (!currentUser) {
       navigate('/fastreg');
@@ -402,6 +416,15 @@ const handleCommandSubmit = (e) => {
     if (displayMode === 'galamode') {
       return renderGalaMode();
     }
+
+
+      // 👇 ДОБАВЬ СЮДА
+  console.log('galaEngine:', galaEngine);
+  if (posts.length > 0) {
+    console.log('первый пост текст:', posts[0].text);
+  }
+
+
     // if (displayMode === 'listmode') {
     //   return renderListMode();
     // }
@@ -414,62 +437,126 @@ const handleCommandSubmit = (e) => {
             <p>✦ В этом канале пока нет постов ✦</p>
           </div>
         ) : (
-          posts.map(post => (
+          posts.map(post => {
+              const parsed = galaEngine.parse(post.text);
+  console.log('parsed highlights:', parsed.highlights);
+  console.log('parsed headings:', parsed.headings);
+  console.log('parsed contentHtml:', parsed.contentHtml);
             
-            <div key={post.postId} className="post-card" data-post-id={post.postId}>
-              <div className="post-title">{post.title}</div>
-              <div className="post-text">{post.text}</div>
-              <div className="post-meta">
-                <span>🕒 {new Date(post.date).toLocaleString()}</span>
-                <span>🔑 {post.postId}</span>
-              </div>
-
-              <div className="comments-section" data-post={post.postId}>
-                <button 
-                  className="toggle-comments"
-                  onClick={() => {
-                    const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
-                    const area = parent.querySelector('.comment-input-area');
-                    area.classList.toggle('show');
-                  }}
-                >
-                  💬 Комментарии {post.comments?.length > 0 && `(${post.comments.length})`}
-                </button>
-                <div className="comment-input-area">
-                  <input
-                    type="text"
-                    value={commentText[post.postId] || ''}
-                    onChange={(e) => setCommentText({ ...commentText, [post.postId]: e.target.value })}
-                    placeholder={currentUser ? "Ваш комментарий..." : "Войдите, чтобы комментировать"}
-                    disabled={!currentUser}
-                  />
+            return (
+              <div key={post.postId} className="post-card" data-post-id={post.postId}>
+                <div className="post-title">{post.title}</div>
+                
+                {galaEngine.render(parsed)}
+                
+                <div className="post-meta">
+                  <span>🕒 {new Date(post.date).toLocaleString()}</span>
+                  <span>🔑 {post.postId}</span>
+                </div>
+          
+                <div className="comments-section" data-post={post.postId}>
                   <button 
-                    className="send-comment"
-                    onClick={async () => {
-                      const text = commentText[post.postId]?.trim();
-                      if (text && currentUser) {
-                        await addComment(post.postId, text);
-                        setCommentText({ ...commentText, [post.postId]: '' });
-                        const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
-                        parent.querySelector('.comment-input-area').classList.remove('show');
-                      }
+                    className="toggle-comments"
+                    onClick={() => {
+                      const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
+                      const area = parent.querySelector('.comment-input-area');
+                      area.classList.toggle('show');
                     }}
-                    disabled={!currentUser}
                   >
-                    ➤
+                    💬 Комментарии {post.comments?.length > 0 && `(${post.comments.length})`}
                   </button>
-                </div>
-                <div className="comments-list">
-                  {(post.comments || []).map((comment, idx) => (
-                    <div key={idx} className="comment-item">
-                      <div className="comment-author">@{comment.author}</div>
-                      <div className="comment-text">{comment.text}</div>
-                    </div>
-                  ))}
+                  <div className="comment-input-area">
+                    <input
+                      type="text"
+                      value={commentText[post.postId] || ''}
+                      onChange={(e) => setCommentText({ ...commentText, [post.postId]: e.target.value })}
+                      placeholder={currentUser ? "Ваш комментарий..." : "Войдите, чтобы комментировать"}
+                      disabled={!currentUser}
+                    />
+                    <button 
+                      className="send-comment"
+                      onClick={async () => {
+                        const text = commentText[post.postId]?.trim();
+                        if (text && currentUser) {
+                          await addComment(post.postId, text);
+                          setCommentText({ ...commentText, [post.postId]: '' });
+                          const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
+                          parent.querySelector('.comment-input-area').classList.remove('show');
+                        }
+                      }}
+                      disabled={!currentUser}
+                    >
+                      ➤
+                    </button>
+                  </div>
+                  <div className="comments-list">
+                    {(post.comments || []).map((comment, idx) => (
+                      <div key={idx} className="comment-item">
+                        <div className="comment-author">@{comment.author}</div>
+                        <div className="comment-text">{comment.text}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
+          // posts.map(post => (
+            
+          //   <div key={post.postId} className="post-card" data-post-id={post.postId}>
+          //     <div className="post-title">{post.title}</div>
+          //     <div className="post-text">{post.text}</div>
+          //     <div className="post-meta">
+          //       <span>🕒 {new Date(post.date).toLocaleString()}</span>
+          //       <span>🔑 {post.postId}</span>
+          //     </div>
+
+          //     <div className="comments-section" data-post={post.postId}>
+          //       <button 
+          //         className="toggle-comments"
+          //         onClick={() => {
+          //           const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
+          //           const area = parent.querySelector('.comment-input-area');
+          //           area.classList.toggle('show');
+          //         }}
+          //       >
+          //         💬 Комментарии {post.comments?.length > 0 && `(${post.comments.length})`}
+          //       </button>
+          //       <div className="comment-input-area">
+          //         <input
+          //           type="text"
+          //           value={commentText[post.postId] || ''}
+          //           onChange={(e) => setCommentText({ ...commentText, [post.postId]: e.target.value })}
+          //           placeholder={currentUser ? "Ваш комментарий..." : "Войдите, чтобы комментировать"}
+          //           disabled={!currentUser}
+          //         />
+          //         <button 
+          //           className="send-comment"
+          //           onClick={async () => {
+          //             const text = commentText[post.postId]?.trim();
+          //             if (text && currentUser) {
+          //               await addComment(post.postId, text);
+          //               setCommentText({ ...commentText, [post.postId]: '' });
+          //               const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
+          //               parent.querySelector('.comment-input-area').classList.remove('show');
+          //             }
+          //           }}
+          //           disabled={!currentUser}
+          //         >
+          //           ➤
+          //         </button>
+          //       </div>
+          //       <div className="comments-list">
+          //         {(post.comments || []).map((comment, idx) => (
+          //           <div key={idx} className="comment-item">
+          //             <div className="comment-author">@{comment.author}</div>
+          //             <div className="comment-text">{comment.text}</div>
+          //           </div>
+          //         ))}
+          //       </div>
+          //     </div>
+          //   </div>
+          // ))
         )}
       </div>
     );
