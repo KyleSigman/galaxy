@@ -1,27 +1,25 @@
 @import '../pages/variables.scss';
 
+@font-face {
+  font-family: "Matricha";
+  src: local("Matricha"),
+    url("../fonts/matricha.ttf") format("truetype");
+}
+
 .origin-reader {
   position: absolute;
   width: 100%;
   min-height: 100%;
   background: $dark-bg;
-  font-family: 'Share Tech Mono', monospace;
+
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-weight: 100;
   padding: 20px; 
   padding-bottom: 80px; // Добавить отступ для нижней панели
   box-sizing: border-box;
   overflow-y: auto;
 
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, $neon-blue, transparent);
-    animation: scanline 3s linear infinite;
-    pointer-events: none;
-  }
+
   
   // Добавить класс для режимов
   &.mode-active {
@@ -606,29 +604,27 @@
   flex-direction: column;
   gap: 20px;
   max-width: 500px;
-  padding-right: 40px;
+  padding-right: 30px;
 }
 
 .post-card {
-  background: rgba(1, 1, 30, 0.13);
-  border: 2px solid $neon-purple;
+
+  // border: 1px solid $neon-purple;
   // box-shadow: inset 0 0 18px $neon-purple;
-  background-color: rgba(149, 0, 255, 0.075);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.441);
+  background-color: rgba(222, 244, 255, 0.049);
+  border-radius: 5px;
   padding: 15px; padding-left: 20px;
   transition: all 0.3s ease;
 //   margin-bottom: 10px;
 
-  &:hover {
-    border-color: $neon-pink;
-    transform: translateX(5px);
-  }
 }
 
 .post-title {
   color: $neon-blue;
   font-size: 25px;
-  font-weight: bold;
+  font-family:'Times New Roman', Times, serif;
+  // font-weight: bold;
   margin-bottom: 12px;
   text-shadow: 0 0 5px $neon-blue;
 }
@@ -1029,7 +1025,7 @@
   right: 0;
   background: rgba(10, 10, 15, 0.95);
   backdrop-filter: blur(10px);
-  border-top: 2px solid $neon-purple;
+  border-top: 2px solid $neon-vio;
   z-index: 100;
   
   .bottom-expandable {
@@ -1114,8 +1110,9 @@
     .bottom-nav-btn {
       background: transparent;
       border: none;
-      color: $neon-purple;
-      font-size: 13px;
+      color: $neon-vio;
+      font-size: 14px;
+      font-weight: bold;
       padding: 8px 16px;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -1135,4 +1132,334 @@
 
 .origin-content {
   transition: all 0.3s ease;
+}
+
+
+
+.word-with-image {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted #ff00cc;
+  
+  .image-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    background: rgba(0,0,0,0.9);
+    border-radius: 8px;
+    padding: 4px;
+    z-index: 1001;
+    display: none;
+    pointer-events: none;
+    
+    img {
+      max-width: 200px;
+      max-height: 150px;
+      border-radius: 4px;
+    }
+  }
+  
+  &:hover .image-tooltip {
+    display: block;
+  }
+}
+
+.variant-word {
+  cursor: pointer;
+  border-bottom: 1px dashed #00ffff;
+  transition: 0.2s;
+  
+  &:hover {
+    background: rgba(0, 255, 255, 0.2);
+  }
+}
+
+.post-content {
+  color: #ffffff; // ← основной текст белый
+  line-height: 1.3;
+}
+
+.text-engine-post {
+  color: #ffffff;
+  margin-bottom: 10px;
+  
+  // Блок тезисов
+  .post-highlights {
+    margin-bottom: 5px;
+    
+    .highlights-title {
+      color: #ffffff;
+      font-size: 13px;
+      // font-weight: 600;
+      margin-bottom: 8px;
+      // letter-spacing: 1px;
+    }
+
+    .highlights-list {
+      display: flex;
+      flex-direction: column;
+
+      .highlight-item {
+        color: #000000;
+        padding-left: 10px;
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: slideIn 1s ease forwards;
+        animation-delay: calc(var(--i) * 0.2s);
+        white-space: normal; // разрешаем перенос строк
+        word-break: break-word; // разрываем длинные слова
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      // .highlight-item {
+      //   overflow: hidden;
+      //   white-space: nowrap;
+      //   max-width: 0;
+      //   transform-origin: left;
+      //   animation: slideIn 1s ease forwards;
+      //   animation-delay: calc(var(--i) * 0.2s);
+      // }
+      
+      // @keyframes slideIn {
+      //   from {
+      //     max-width: 0;
+      //     opacity: 0;
+      //     transform: translateX(-20px);
+      //   }
+      //   to {
+      //     max-width: 500px;
+      //     opacity: 1;
+      //     transform: translateX(0);
+      //   }
+      // }
+
+      // .highlight-item {
+      //   padding: 3px;
+      //   padding-left: 10px; 
+      //   // margin: 0;
+      //   // border-left: 3px solid;
+      //   color: black;
+        
+      //   // Базовый цвет для каждого элемента через JS
+      //   // или используй CSS-переменные
+        
+      //   .highlight-marker {
+      //     margin-right: 12px;
+      //   }
+        
+      //   .highlight-text {
+      //     font-size: 14px;
+      //   }
+      // }
+    }
+
+    // .highlights-list {
+
+    //   .highlight-item {
+    //     background: rgb(255, 217, 0); 
+    //     padding: 10px 16px;
+    //     margin: 0;
+    //     border-left: 3px solid #ffa600;
+        
+    //     &:nth-child(odd) {
+    //       background: rgb(255, 219, 179);
+    //     }
+        
+    //     .highlight-marker {
+    //       margin-right: 12px;
+    //       color: #000000;
+    //     }
+        
+    //     .highlight-text {
+    //       color: #000000;
+    //       font-size: 14px;
+    //     }
+    //   }
+    // }
+  }
+  
+  // Блок оглавления
+  .post-toc {
+    margin-bottom: 5px;
+    
+    .toc-title {
+      color: $neon-green;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: inline-block;
+      border-bottom: 1px dashed $neon-green;
+      padding-bottom: 2px;
+      transition: 0.2s;
+      
+      &:hover {
+        opacity: 0.8;
+      }
+      
+      &.open {
+        border-bottom: none;
+      }
+    }
+    
+    .toc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      
+      .toc-item {
+        color: $neon-green;
+        text-decoration: none;
+        font-size: 13px;
+        display: inline-block;
+        transition: 0.2s;
+        
+        &:hover {
+          color: #ffffff;
+          transform: translateX(4px);
+        }
+        
+        .toc-bullet {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+  
+  // .post-toc {
+  //   margin-bottom: 24px;
+    
+  //   .toc-title {
+  //     color: #ffffff;
+  //     font-size: 14px;
+  //     font-weight: 600;
+  //     margin-bottom: 12px;
+  //     letter-spacing: 1px;
+  //   }
+    
+  //   .toc-list {
+  //     display: flex;
+  //     flex-direction: column;
+  //     gap: 8px;
+      
+  //     .toc-item {
+  //       color: #88ff88;
+  //       text-decoration: none;
+  //       font-size: 13px;
+  //       display: inline-block;
+  //       border-bottom: none;
+  //       transition: 0.2s;
+        
+  //       &:hover {
+  //         color: #ffffff;
+  //         transform: translateX(4px);
+  //       }
+        
+  //       .toc-bullet {
+  //         margin-right: 8px;
+  //         color: #88ff88;
+  //       }
+  //     }
+  //   }
+  // }
+  
+  // Основной контент
+  .post-content {
+    color: #ffffff;
+    font-size: 15px;
+    
+    strong {
+      color: #ffaa88;
+    }
+    
+    em {
+      color: #88aaff;
+    }
+    
+    a {
+      color: $neon-green;
+      text-decoration: none;
+      border-bottom: 1px dotted $neon-green;
+      
+      &:hover {
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+.post-heading {
+  color: $neon-green;
+  font-family: "Matricha", "Share Tech Mono", monospace;
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: none;
+  // margin: 1.5rem 0 0.75rem;
+}
+
+.inline-highlight {
+  background: #FFE5B4; // базовый, но будет переопределяться inline-стилем
+  color: #000000;
+  padding: 4px 8px;
+  margin: 0 2px;
+  display: inline-block;
+  border-radius: 0; // убираем скругление
+  font-weight: normal;
+}
+
+// .inline-highlight {
+//   padding: 2px 8px;
+//   border-radius: 4px;
+//   font-weight: 500;
+//   display: inline-block;
+// }
+
+.exclamation-mark {
+  color: #ffdc85;
+  font-style: italic;
+  font-weight: 500;
+  // padding-left: 8px;
+  // margin: 8px 0;
+  display: inline-block;
+}
+
+
+// Полное отключение :target для всех элементов движка
+.text-engine-post *:target {
+  background: inherit !important;
+  color: inherit !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+// Особо для заголовков
+.post-heading:target {
+  background: transparent !important;
+  color: $neon-green !important;
+}
+
+// Для подсвеченных элементов
+.inline-highlight:target {
+  background: inherit !important;
+  color: #000000 !important;
+}
+
+// Для тезисов
+.highlight-item:target {
+  background: inherit !important;
+  border-left-color: inherit !important;
 }
