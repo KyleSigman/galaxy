@@ -286,6 +286,76 @@ const handleCommandSubmit = (e) => {
     navigate('/create-origin');
   };
 
+  const addReaction = async (postId, reactionType) => {
+    if (!currentUser) {
+        navigate('/fastreg');
+        return;
+    }
+    
+    try {
+        const channelRef = doc(db, 'origins', channelId);
+        const channelSnap = await getDoc(channelRef);
+        const currentPosts = channelSnap.data().posts || [];
+        
+        const updatedPosts = currentPosts.map(post => {
+            if (post.postId === postId) {
+                const users = post.reactions?.users || {};
+                
+                // Проверяем, ставил ли уже реакцию этот пользователь
+                if (users[currentUser.uid]) {
+                    return post; // уже ставил, ничего не меняем
+                }
+                
+                return {
+                    ...post,
+                    reactions: {
+                        ok: (post.reactions?.ok || 0) + 1,
+                        users: {
+                            ...users,
+                            [currentUser.uid]: reactionType
+                        }
+                    }
+                };
+            }
+            return post;
+        });
+        
+        await updateDoc(channelRef, { posts: updatedPosts });
+        setChannel({ ...channel, posts: updatedPosts });
+    } catch (error) {
+        console.error('Error adding reaction:', error);
+    }
+};
+
+//   const addReaction = async (postId, reactionType) => {
+//     if (!currentUser) {
+//         navigate('/fastreg');
+//         return;
+//     }
+    
+//     try {
+//         const channelRef = doc(db, 'origins', channelId);
+//         const updatedPosts = channel.posts.map(post => {
+//             if (post.postId === postId) {
+//                 const currentReactions = post.reactions || { ok: 0 };
+//                 return {
+//                     ...post,
+//                     reactions: {
+//                         ...currentReactions,
+//                         [reactionType]: (currentReactions[reactionType] || 0) + 1
+//                     }
+//                 };
+//             }
+//             return post;
+//         });
+        
+//         await updateDoc(channelRef, { posts: updatedPosts });
+//         setChannel({ ...channel, posts: updatedPosts });
+//     } catch (error) {
+//         console.error('Error adding reaction:', error);
+//     }
+// };
+
   // Получить последний пост для режима listmode
   // const getLastPost = (channelData) => {
   //   const posts = channelData.posts || [];
@@ -446,7 +516,28 @@ const handleCommandSubmit = (e) => {
             return (
               <div key={post.postId} className="post-card" data-post-id={post.postId}>
                 <div className="post-title">{post.title}</div>
-                
+                <div className="post-stats-line">
+                <span className="post-manner">
+                    {post.manner === 'casual' && '😛 Разговорный'}
+                    {post.manner === 'literary' && '📖 Литературный'}
+                    {post.manner === 'emotional' && '😤 Эмоциональный'}
+                    {post.manner === 'technical' && '⚙️ Технический'}
+                    {post.manner === 'poetic' && '🎭 Поэтичный'}
+                    {post.manner === 'mystic' && '🔮 Мистический'}
+                    {post.manner === 'ironic' && '😏 Ироничный'}
+                    {!post.manner && '—'}
+                </span>
+                <span className="post-author-type">
+                    {post.authorType === 'ni' && '⚛︎ NI'}
+                    {post.authorType === 'ai' && '🤖 AI'}
+                    {post.authorType === 'xi' && '🔄 XI'}
+                    {!post.authorType && '—'}
+                </span>
+                <span className="post-comments-count">💬 {post.comments?.length || 0}</span>
+                <span className="post-reactions-count">
+                    👌 {post.reactions?.ok || 0}
+                </span>
+            </div>
                 {galaEngine.render(parsed)}
                 
                 <div className="post-meta">
@@ -455,7 +546,22 @@ const handleCommandSubmit = (e) => {
                 </div>
           
                 <div className="comments-section" data-post={post.postId}>
-                  <button 
+                <button 
+                  className="toggle-comments"
+                  onClick={(e) => {
+                    const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
+                    const area = parent.querySelector('.comment-input-area');
+                    const list = parent.querySelector('.comments-list');
+                    const btn = e.currentTarget;
+                    
+                    area.classList.toggle('show');
+                    list.classList.toggle('show');
+                    btn.classList.toggle('open');
+                  }}
+                >
+                  💬 Комментарии {post.comments?.length > 0 && `(${post.comments.length})`}
+                </button>
+                  {/* <button 
                     className="toggle-comments"
                     onClick={() => {
                       const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
@@ -464,7 +570,7 @@ const handleCommandSubmit = (e) => {
                     }}
                   >
                     💬 Комментарии {post.comments?.length > 0 && `(${post.comments.length})`}
-                  </button>
+                  </button> */}
                   <div className="comment-input-area">
                     <input
                       type="text"
@@ -474,6 +580,29 @@ const handleCommandSubmit = (e) => {
                       disabled={!currentUser}
                     />
                     <button 
+    className="send-comment"
+    onClick={async () => {
+        const text = commentText[post.postId]?.trim();
+        if (text && currentUser) {
+            await addComment(post.postId, text);
+            setCommentText({ ...commentText, [post.postId]: '' });
+            
+            const parent = document.querySelector(`.comments-section[data-post="${post.postId}"]`);
+            const area = parent.querySelector('.comment-input-area');
+            const list = parent.querySelector('.comments-list');
+            const btn = parent.querySelector('.toggle-comments');
+            
+            // Скрываем всё
+            area.classList.remove('show');
+            list.classList.remove('show');
+            btn.classList.remove('open');
+        }
+    }}
+    disabled={!currentUser}
+>
+    ➤
+</button>
+                    {/* <button 
                       className="send-comment"
                       onClick={async () => {
                         const text = commentText[post.postId]?.trim();
@@ -487,7 +616,7 @@ const handleCommandSubmit = (e) => {
                       disabled={!currentUser}
                     >
                       ➤
-                    </button>
+                    </button> */}
                   </div>
                   <div className="comments-list">
                     {(post.comments || []).map((comment, idx) => (
@@ -498,6 +627,16 @@ const handleCommandSubmit = (e) => {
                     ))}
                   </div>
                 </div>
+
+                <div className="post-reaction-btn">
+                <button 
+    className="reaction-ok"
+    onClick={() => addReaction(post.postId, 'ok')}
+>
+    👌 {post.reactions?.ok || 0}
+</button>
+                </div>
+                
               </div>
             );
           })
