@@ -25,7 +25,9 @@ const GalaxyChat = () => {
     setIsAuthor(false);
     setMode('dialog');
     
-    const socket = new WebSocket('ws://localhost:8080');
+    // Динамический WebSocket URL для работы и на localhost, и на сервере
+    const wsUrl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}`;
+    const socket = new WebSocket(wsUrl);
     
     socket.onopen = () => {
       socket.send(JSON.stringify({
@@ -58,6 +60,7 @@ const GalaxyChat = () => {
       setIsConnected(false);
     };
   };
+  
   // const connect = (room) => {
   //   const socket = new WebSocket('ws://localhost:8080');
     
