@@ -622,11 +622,11 @@
 
 .post-title {
   color: $neon-blue;
-  font-size: 25px;
+  font-size: 22px;
   font-family:'Times New Roman', Times, serif;
   // font-weight: bold;
   margin-bottom: 12px;
-  text-shadow: 0 0 5px $neon-blue;
+  // text-shadow: 0 0 5px $neon-blue;
 }
 
 .post-text {
@@ -644,15 +644,14 @@
   gap: 15px;
   color: $neon-purple;
   font-size: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 0px;
   padding-bottom: 10px;
   // border-bottom: 1px solid rgba(255,0,255,0.2);
 }
 
 .comments-section {
-  margin-top: 15px;
-  padding-top: 10px;
-  // border-top: 1px solid rgba(0,255,255,0.2);
+  margin-top: 0px;
+  padding-top: 0px;
 
   .toggle-comments {
     background: transparent;
@@ -661,10 +660,19 @@
     font-family: 'Share Tech Mono', monospace;
     cursor: pointer;
     padding: 5px 0;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    position: relative;
+    padding-right: 20px;
 
-    &:hover {
-      text-shadow: 0 0 5px $neon-green;
+    &::after {
+      content: '^';
+      position: absolute;
+      right: 0;
+      transition: transform 0.2s;
+    }
+
+    &.open::after {
+      transform: rotate(180deg);
     }
   }
 
@@ -718,17 +726,136 @@
   }
 
   .comments-list {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 10px;
+
+    &.show {
+      display: flex;
+    }
   }
 }
 
+.post-stats-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(255, 0, 255, 0.3);
+  font-size: 12px;
+  
+  span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: $neon-purple;
+      
+      &.post-comments-count,
+      &.post-reactions-count {
+          color: $neon-green;
+      }
+  }
+}
+
+.post-reaction-btn {
+  margin-top: 12px;
+  text-align: right;
+  
+  .reaction-ok {
+      background: transparent;
+      border: 1px solid $neon-green;
+      border-radius: 20px;
+      padding: 6px 12px;
+      color: $neon-green;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+          background: $neon-green;
+          color: $dark-bg;
+      }
+  }
+}
+
+// .comments-section {
+//   margin-top: 15px;
+//   padding-top: 10px;
+//   // border-top: 1px solid rgba(0,255,255,0.2);
+
+//   .toggle-comments {
+//     background: transparent;
+//     border: none;
+//     color: $neon-green;
+//     font-family: 'Share Tech Mono', monospace;
+//     cursor: pointer;
+//     padding: 5px 0;
+//     margin-bottom: 10px;
+
+//   }
+
+//   .comment-input-area {
+//     display: flex;
+//     gap: 10px;
+//     margin-bottom: 15px;
+//     display: none;
+
+//     &.show {
+//       display: flex;
+//     }
+
+//     input {
+//       flex: 1;
+//       background: rgba(0,0,0,0.5);
+//       border: 2px solid $neon-purple;
+//       border-radius: 20px;
+//       padding: 8px 15px;
+//       color: white;
+//       font-family: 'Share Tech Mono', monospace;
+
+//       &:focus {
+//         outline: none;
+//         border-color: $neon-pink;
+//       }
+
+//       &:disabled {
+//         opacity: 0.5;
+//       }
+//     }
+
+//     button {
+//       background: transparent;
+//       border: 2px solid $neon-green;
+//       border-radius: 20px;
+//       padding: 5px 15px;
+//       color: $neon-green;
+//       cursor: pointer;
+
+//       &:hover:not(:disabled) {
+//         background: $neon-green;
+//         color: $dark-bg;
+//       }
+
+//       &:disabled {
+//         opacity: 0.5;
+//         cursor: not-allowed;
+//       }
+//     }
+//   }
+
+//   .comments-list {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 10px;
+//   }
+// }
+
 .comment-item {
   background: rgba(0,0,0,0.3);
-  border: 1px dashed $neon-purple;
+  border: 1px solid rgba(255, 255, 255, 0.221);
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 5px;
 
   .comment-author {
     color: $neon-green;
@@ -1192,7 +1319,7 @@
     .highlights-title {
       color: #ffffff;
       font-size: 13px;
-      // font-weight: 600;
+      font-weight: normal;
       margin-bottom: 8px;
       // letter-spacing: 1px;
     }
@@ -1293,12 +1420,12 @@
   // Блок оглавления
   .post-toc {
     margin-bottom: 5px;
-    
+    display: none;
     .toc-title {
       color: $neon-green;
       font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 1px;
+      font-weight: normal;
+      letter-spacing: normal;
       cursor: pointer;
       display: inline-block;
       border-bottom: 1px dashed $neon-green;
@@ -1323,6 +1450,7 @@
       .toc-item {
         color: $neon-green;
         text-decoration: none;
+        cursor: pointer;
         font-size: 13px;
         display: inline-block;
         transition: 0.2s;
@@ -1402,11 +1530,12 @@
 }
 
 .post-heading {
-  color: $neon-green;
-  font-family: "Matricha", "Share Tech Mono", monospace;
-  font-size: 15px;
+  color: white;
   font-weight: bold;
+  text-shadow: none;
+  font-size: 16px;
   text-transform: none;
+  letter-spacing: normal;
   // margin: 1.5rem 0 0.75rem;
 }
 
@@ -1449,7 +1578,8 @@
 // Особо для заголовков
 .post-heading:target {
   background: transparent !important;
-  color: $neon-green !important;
+  color: white !important;
+  // color: $neon-green !important;
 }
 
 // Для подсвеченных элементов
