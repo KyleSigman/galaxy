@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom'; 
+// import { Link } from 'react-router-dom';
 import "../pages/GalaxyChat.scss";
 
 const GalaxyChat = () => {
   const [ws, setWs] = useState(null);
-  const [roomId, setRoomId] = useState('');
+  const [searchParams] = useSearchParams();
+  const [roomId, setRoomId] = useState(searchParams.get('room') || '');
+  // const [roomId, setRoomId] = useState('');
   const [nick, setNick] = useState(localStorage.getItem('galaxyNick') || '');
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -16,8 +19,13 @@ const GalaxyChat = () => {
 
   // Подключение к WebSocket
   const connect = (room) => {
-    const socket = new WebSocket(`wss://galaxy-zbyh.onrender.com`);
-    // const socket = new WebSocket(`${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}`);
+    // Очищаем всё перед новым подключением
+    setMessages([]);
+    setAllowedUsers([]);
+    setIsAuthor(false);
+    setMode('dialog');
+    
+    const socket = new WebSocket('ws://localhost:8080');
     
     socket.onopen = () => {
       socket.send(JSON.stringify({
@@ -50,6 +58,40 @@ const GalaxyChat = () => {
       setIsConnected(false);
     };
   };
+  // const connect = (room) => {
+  //   const socket = new WebSocket('ws://localhost:8080');
+    
+  //   socket.onopen = () => {
+  //     socket.send(JSON.stringify({
+  //       type: 'join',
+  //       roomId: room,
+  //       nick: nick || 'Аноним'
+  //     }));
+  //     setWs(socket);
+  //     setIsConnected(true);
+  //     setRoomId(room);
+  //   };
+  
+  //   socket.onmessage = (e) => {
+  //     const data = JSON.parse(e.data);
+      
+  //     if (data.type === 'init') {
+  //       setIsAuthor(data.isAuthor);
+  //       setMode(data.mode);
+  //       setAllowedUsers(data.allowedUsers || []);
+  //     }
+  //     else if (data.type === 'mode_changed') {
+  //       setMode(data.mode);
+  //       setAllowedUsers(data.allowedUsers || []);
+  //     } else {
+  //       setMessages(prev => [...prev, data]);
+  //     }
+  //   };
+  
+  //   socket.onclose = () => {
+  //     setIsConnected(false);
+  //   };
+  // };
 
   // const connect = (room) => {
   //   const socket = new WebSocket('ws://localhost:8080');
@@ -104,11 +146,17 @@ const GalaxyChat = () => {
   // };
 
   // Создать комнату
-  
+
   const createRoom = () => {
     const newRoom = Math.random().toString(36).substring(2, 8).toUpperCase();
+    setMessages([]);
     connect(newRoom);
   };
+  
+  // const createRoom = () => {
+  //   const newRoom = Math.random().toString(36).substring(2, 8).toUpperCase();
+  //   connect(newRoom);
+  // };
 
   // Войти в комнату
   const joinRoom = () => {
@@ -184,10 +232,12 @@ const GalaxyChat = () => {
   };
 
   // Сохранить чат
+
   const saveChat = () => {
     const data = {
       roomId,
       mode,
+      allowedUsers,  // ← добавить эту строку
       messages,
       savedAt: new Date().toISOString()
     };
@@ -198,19 +248,160 @@ const GalaxyChat = () => {
     a.download = `chat-${roomId}-${Date.now()}.cosmic`;
     a.click();
   };
+  
+  // const saveChat = () => {
+  //   const data = {
+  //     roomId,
+  //     mode,
+  //     messages,
+  //     savedAt: new Date().toISOString()
+  //   };
+  //   const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  //   const url = URL.createObjectURL(blob);
+  //   const a = document.createElement('a');
+  //   a.href = url;
+  //   a.download = `chat-${roomId}-${Date.now()}.cosmic`;
+  //   a.click();
+  // };
 
   // Загрузить чат
-  const loadChat = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = JSON.parse(e.target.result);
-      setMessages(data.messages);
-      setRoomId(data.roomId);
-      setMode(data.mode || 'dialog');
-    };
-    reader.readAsText(file);
+  // Загрузить чат
+const loadChat = (e) => {
+  const file = e.target.files[0];
+  
+  if (!file) {
+    alert("Файл не выбран");
+    return;
+  }
+  
+  const reader = new FileReader();
+  
+  reader.onload = (e) => {
+    const data = JSON.parse(e.target.result);
+    
+    // 1. Проверка ID комнаты
+    if (data.roomId !== roomId) {
+      alert(`❌ ID не совпадает\nФайл: ${data.roomId}\nТекущая: ${roomId}`);
+      return;
+    }
+    
+    // 2. Проверка прав (только автор)
+    if (!isAuthor) {
+      alert(`⛔ Только автор может восстановить историю`);
+      return;
+    }
+    
+    // 3. Восстановление режима (если отличается)
+    if (data.mode && data.mode !== mode) {
+      ws.send(JSON.stringify({
+        type: 'change_mode',
+        mode: data.mode,
+        allowedUsers: data.mode === 'conference' ? (data.allowedUsers || []) : []
+      }));
+    }
+    
+    // 4. Восстановление списка разрешённых пользователей (для конференции)
+    if (data.mode === 'conference' && data.allowedUsers) {
+      data.allowedUsers.forEach(user => {
+        if (!allowedUsers.includes(user)) {
+          ws.send(JSON.stringify({ type: 'allow_user', user }));
+        }
+      });
+    }
+    
+    // 5. Отправка истории на сервер
+    ws.send(JSON.stringify({
+      type: 'restore_history',
+      messages: data.messages,
+      roomId: data.roomId
+    }));
+    
+    alert(`✅ Восстановлено:\n• ${data.messages.length} сообщений\n• Режим: ${data.mode}`);
   };
+  
+  reader.readAsText(file);
+};
+//   const loadChat = (e) => {
+//     const file = e.target.files[0];
+//     const reader = new FileReader();
+    
+//     reader.onload = (e) => {
+//       const data = JSON.parse(e.target.result);
+      
+//       // 1. Проверка ID комнаты
+//       if (data.roomId !== roomId) {
+//         alert(`❌ ID не совпадает\nФайл: ${data.roomId}\nТекущая: ${roomId}`);
+//         return;
+//       }
+      
+//       // 2. Проверка прав (только автор)
+//       if (!isAuthor) {
+//         alert(`⛔ Только автор может восстановить историю`);
+//         return;
+//       }
+
+//       // 3. Восстановление режима (если отличается)
+// if (data.mode && data.mode !== mode) {
+//   ws.send(JSON.stringify({
+//     type: 'change_mode',
+//     mode: data.mode,
+//     allowedUsers: data.mode === 'conference' ? (data.allowedUsers || []) : []  // ← сразу передаём сохранённый список
+//   }));
+// }
+
+// // 4. Восстановление списка разрешённых пользователей (только если нужно добавить новых)
+// // Этот блок можно удалить, так как список уже передан в change_mode
+// // Но оставить на случай, если появятся новые пользователи после восстановления
+// if (data.mode === 'conference' && data.allowedUsers) {
+//   data.allowedUsers.forEach(user => {
+//     if (!allowedUsers.includes(user)) {
+//       ws.send(JSON.stringify({ type: 'allow_user', user }));
+//     }
+//   });
+// }
+
+//       // 3. Восстановление режима (если отличается)
+//       // if (data.mode && data.mode !== mode) {
+//       //   ws.send(JSON.stringify({
+//       //     type: 'change_mode',
+//       //     mode: data.mode,
+//       //     allowedUsers: data.mode === 'conference' ? allowedUsers : []
+//       //   }));
+//       // }
+      
+//       // 4. Восстановление списка разрешённых пользователей (для конференции)
+//       // if (data.mode === 'conference' && data.allowedUsers) {
+//       //   data.allowedUsers.forEach(user => {
+//       //     if (!allowedUsers.includes(user)) {
+//       //       ws.send(JSON.stringify({ type: 'allow_user', user }));
+//       //     }
+//       //   });
+//       // }
+      
+//       // 5. Отправка истории на сервер
+//       ws.send(JSON.stringify({
+//         type: 'restore_history',
+//         messages: data.messages,
+//         roomId: data.roomId
+//       }));
+      
+//       alert(`✅ Восстановлено:\n• ${data.messages.length} сообщений\n• Режим: ${data.mode}`);
+//     };
+    
+//     reader.readAsText(file);
+//   };
+
+  // const loadChat = (e) => {
+  //   const file = e.target.files[0];
+  //   const reader = new FileReader();
+  //   reader.onload = (e) => {
+  //     const data = JSON.parse(e.target.result);
+  //     setMessages(data.messages);
+  //     setRoomId(data.roomId);
+  //     setMode(data.mode || 'dialog');
+  //   };
+  //   reader.readAsText(file);
+  // };
 
   // Автоскролл
   useEffect(() => {
@@ -226,13 +417,13 @@ const GalaxyChat = () => {
     <div className="galaxy-chat">
       <div className="chat-header">
         <h1>✦ GALAXY CHAT ✦</h1>
-        <p>межгалактический чат</p>
+        <p>галактический чат</p>
       </div>
 
       {!isConnected ? (
         <div className="room-manager">
         <div className="terminal-panel">
-          <h3>🔮 ВХОД В ЧАТ</h3>
+          <h3>🌌 ВХОД В ЧАТ</h3>
           
           <div className="form-group">
             <label>ТВОЙ НИК</label>
@@ -306,7 +497,17 @@ const GalaxyChat = () => {
       ) : (
         <div className="chat-container">
           <div className="room-info">
-            <span>КОМНАТА: {roomId}</span>
+          <span 
+            className="room-id-clickable" 
+            onClick={() => {
+              navigator.clipboard.writeText(roomId);
+              alert(`📋 ID комнаты скопирован: ${roomId}`);
+            }}
+            title="Нажми чтобы скопировать"
+          >
+            КОМНАТА: {roomId}
+          </span>
+            {/* <span>КОМНАТА: {roomId}</span> */}
             <span>НИК: {nick}</span>
             {isAuthor && <span className="author-badge">👑 АВТОР</span>}
           </div>
