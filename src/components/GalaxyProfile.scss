@@ -471,6 +471,7 @@ body
   .visual-key-mini {
     position: relative;
     display: inline-block;
+    margin: 10px;
 
         canvas {
       width: 150px;
@@ -489,8 +490,9 @@ body
     }
   
     .key-btn {
-      width: 24px;
-      height: 24px;
+      width: 34px;
+      height: 34px;
+      margin-left: 10px;
       border-radius: 50%;
       border: 2px solid;
       background: $dark-bg;
