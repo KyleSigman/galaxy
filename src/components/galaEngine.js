@@ -26,7 +26,7 @@ const ImageHover = ({ word, url }) => (
 const HighlightBlock = ({ highlights }) => {
   // Палитра цветов
   const baseColors = [
-    '#FF0000', // красный
+    // '#FF0000', // красный
     '#ffc340', // оранжевый
     '#FFFF00', // желтый
     '#00FF00', // зеленый
@@ -97,79 +97,6 @@ const HighlightBlock = ({ highlights }) => {
   );
 };
 
-// const HighlightBlock = ({ highlights }) => {
-//   // Палитра ярких цветов для фона
-//   const colors = [
-//     '#FF0000', // красный
-//     '#ffc340', // оранжевый
-//     '#FFFF00', // желтый
-//     '#00FF00', // зеленый
-//     '#c8ff17', // лимон
-//     '#00FFFF', // циан
-//     '#3884ff', // синий
-//     '#FF00FF', // индиго
-//     '#b47aff', // лилак
-//   ];
-  
-//   // Цвет границы
-//   const borderColors = [
-//     '#FF8C42',
-//     '#FF6B6B',
-//     '#4A9E6E',
-//     '#4A8FE7',
-//     '#E6B422',
-//     '#9B6B9E',
-//     '#F4A261',
-//     '#2C8C8C',
-//     '#E67E22',
-//     '#A64B4B',
-//     '#6A9C6A',
-//     '#E67E22',
-//   ];
-  
-//   return (
-//     <div className="post-highlights">
-//       <div className="highlights-title">🔥 лучшие тезисы</div>
-//       <div className="highlights-list">
-//       {highlights.map((h, i) => {
-//   const colorIndex = i % colors.length;
-//   const marginLeft = i * 5; // каждый следующий +5px, первый 0
-//   return (
-//     <div 
-//       key={i} 
-//       className="highlight-item"
-//       style={{
-//         background: colors[colorIndex],
-//         borderLeftColor: borderColors[colorIndex],
-//         marginLeft: `${marginLeft}px`
-//       }}
-//     >
-//       <span className="highlight-marker">✦</span>
-//       <span className="highlight-text">{h}</span>
-//     </div>
-//   );
-// })}
-//       </div>
-//     </div>
-//   );
-// };
-
-// const HighlightBlock = ({ highlights }) => (
-  
-//   <div className="post-highlights">
-//     <div className="highlights-title">🔥 ГОРЯЧИЕ ТЕЗИСЫ</div>
-//     <div className="highlights-list">
-//       {highlights.map((h, i) => (
-//         <div key={i} className="highlight-item">
-//           <span className="highlight-marker">✦</span>
-//           <span className="highlight-text">{h}</span>
-//         </div>
-//       ))}
-//     </div>
-//   </div>
-// );
-
-// Вспомогательный компонент оглавления с возможностью свернуть
 
 const TocBlock = ({ headings }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -233,45 +160,6 @@ const TocBlock = ({ headings }) => {
   );
 };
 
-// const TocBlock = ({ headings }) => {
-//   const [isOpen, setIsOpen] = React.useState(false);
-  
-//   return (
-//     <div className="post-toc">
-//       <div 
-//         className={`toc-title ${isOpen ? 'open' : ''}`}
-//         onClick={() => setIsOpen(!isOpen)}
-//       >
-//         содержание
-//       </div>
-//       {isOpen && (
-//         <div className="toc-list">
-//           {headings.map((h, i) => (
-//             <a key={i} href={`#${h.id}`} className="toc-item">
-//               <span className="toc-bullet">▹</span>
-//               <span className="toc-text">{h.text}</span>
-//             </a>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// const TocBlock = ({ headings }) => (
-//   <div className="post-toc">
-//     <div className="toc-title">СОДЕРЖАНИЕ</div>
-//     <div className="toc-list">
-//       {headings.map((h, i) => (
-//         <a key={i} href={`#${h.id}`} className="toc-item">
-//           <span className="toc-bullet">▹</span>
-//           <span className="toc-text">{h.text}</span>
-//         </a>
-//       ))}
-//     </div>
-//   </div>
-// );
-
 class GalaEngine {
   constructor() {
     this.rules = {
@@ -283,9 +171,69 @@ class GalaEngine {
     };
   }
 
+//   parse(rawText) {
+//     if (!rawText) return { highlights: [], headings: [], contentBlocks: [] };
+    
+//     let content = rawText;
+    
+//     // Извлечь highlights
+//     const highlights = [];
+//     let match;
+//     while ((match = this.rules.highlight.exec(content)) !== null) {
+//         highlights.push(match[1].trim());
+//     }
+    
+//     // Извлечь headings
+//     const headings = [];
+//     while ((match = this.rules.heading.exec(content)) !== null) {
+//         const headingText = match[1].trim();
+//         headings.push({
+//             text: headingText,
+//             id: this.slugify(headingText)
+//         });
+//     }
+    
+//     // Разбить на блоки по пустым строкам
+//     const rawBlocks = content.split(/\n\s*\n/);
+//     const contentBlocks = [];
+    
+//     rawBlocks.forEach((block, index) => {
+//         // Обработать непустой блок
+//         if (block.trim() !== '') {
+//             let processed = block;
+            
+//             // Обработка заголовков
+//             processed = processed.replace(/^## (.*)$/gm, (match, title) => {
+//                 const id = this.slugify(title);
+//                 return `<h2 class="post-heading" id="${id}">${title}</h2>`;
+//             });
+            
+//             // Обработка highlights
+//             processed = processed.replace(/\^\^(.*?)\^\^/g, (match, text) => {
+//                 const colors = ['#ffc340', '#FFFF00', '#00FF00', '#c8ff17', '#00FFFF', '#3884ff', '#FF00FF', '#b47aff'];
+//                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
+//                 return `<span class="inline-highlight" style="background: ${randomColor}; color: #000000;">${text}</span>`;
+//             });
+            
+//             // Обработка !!
+//             processed = processed.replace(/!!(.*?)(?=\n|$)/g, '<span class="exclamation-mark">⚡ $1</span>');
+            
+//             contentBlocks.push(this.parseBlock(processed));
+//         }
+        
+//         // Добавить пустую строку-разделитель после каждого блока, кроме последнего
+//         if (index < rawBlocks.length - 1) {
+//             contentBlocks.push(<div key={`spacer-${index}`} className="content-block-spacer" />);
+//         }
+//     });
+    
+//     return { highlights, headings, contentBlocks };
+// }
+
+
   parse(rawText) {
     if (!rawText) return { highlights: [], headings: [], contentBlocks: [] };
-  
+    console.log('RAW TEXT FROM DB:', JSON.stringify(rawText)); 
     let content = rawText;
     
     // Извлечь highlights
@@ -313,7 +261,7 @@ content = content.replace(/^## (.*)$/gm, (match, title) => {
 // content = content.replace(/^## (.*)$/gm, '<h2 class="post-heading">$1</h2>');
 content = content.replace(/\^\^(.*?)\^\^/g, (match, text) => {
   const colors = [
-    '#FF0000', // красный
+    // '#FF0000', // красный
     '#ffc340', // оранжевый
     '#FFFF00', // желтый
     '#00FF00', // зеленый
@@ -330,7 +278,18 @@ content = content.replace(/\^\^(.*?)\^\^/g, (match, text) => {
     
     // Разобрать контент на блоки
     const blocks = content.split(/\n\s*\n/);
-    const contentBlocks = blocks.map(block => this.parseBlock(block));
+    console.log('BLOCKS:', blocks.map((b, i) => `[${i}]: "${b}"`));
+    
+    const contentBlocks = blocks.map((block, index) => {
+        if (block.trim() === '') {
+            console.log(`Блок ${index} пустой, создаю спейсер`);
+            return <div key={`spacer-${index}`} className="content-block-spacer" />;
+        }
+        console.log(`Блок ${index} не пустой, длина ${block.length}`);
+        return this.parseBlock(block);
+    });
+    // const blocks = content.split(/\n\s*\n/);
+    // const contentBlocks = blocks.map(block => this.parseBlock(block));
     
     return { highlights, headings, contentBlocks };
   }
@@ -446,6 +405,8 @@ content = content.replace(/\^\^(.*?)\^\^/g, (match, text) => {
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    html = html.replace(/\n/g, '<br/>');
     
     // Возвращаем как React-элемент с HTML
     return <span dangerouslySetInnerHTML={{ __html: html }} />;
@@ -477,118 +438,3 @@ content = content.replace(/\^\^(.*?)\^\^/g, (match, text) => {
 
 const galaEngine = new GalaEngine();
 export default galaEngine;
-
-// // galaEngine.js
-
-// class GalaEngine {
-//   constructor() {
-//     this.rules = {
-//       highlight: /^\^\^(.*?)\^\^$/gm,
-//       heading: /^## (.*)$/gm,
-//       variant: /(\S+)\|(\S+)/g,
-//       image: /(\S+)\[img:(https?:\/\/[^\s\]]+)\]/g
-//     };
-//   }
-
-//   parse(rawText) {
-//     if (!rawText) return { highlights: [], headings: [], contentHtml: '' };
-
-//     let content = rawText;
-    
-//     const highlights = [];
-//     let match;
-//     while ((match = this.rules.highlight.exec(content)) !== null) {
-//       highlights.push(match[1].trim());
-//     }
-//     content = content.replace(/^\^\^.*?\^\^$\n?/gm, '');
-    
-//     const headings = [];
-//     while ((match = this.rules.heading.exec(content)) !== null) {
-//       const headingText = match[1].trim();
-//       headings.push({
-//         text: headingText,
-//         id: this.slugify(headingText)
-//       });
-//     }
-//     content = content.replace(/^## .*$/gm, '');
-    
-//     let contentHtml = this.parseInline(content);
-//     contentHtml = this.processMarkdown(contentHtml);
-//     contentHtml = contentHtml.replace(/\n/g, '<br/>');
-    
-//     return { highlights, headings, contentHtml };
-//   }
-
-//   parseInline(text) {
-//     if (!text) return '';
-//     let html = text;
-    
-//     html = html.replace(this.rules.image, (match, word, url) => {
-//       return `<span class="word-with-image" data-image="${url}">${word}<span class="image-tooltip"><img src="${url}" onerror="this.style.display='none'"></span></span>`;
-//     });
-    
-//     html = html.replace(this.rules.variant, (match, word1, word2) => {
-//       return `<span class="variant-word" data-variant="${word1}|${word2}">${word1}</span>`;
-//     });
-    
-//     return html;
-//   }
-
-//   processMarkdown(text) {
-//     let html = text;
-//     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-//     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-//     html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-//     return html;
-//   }
-
-//   render(parsed) {
-//     const { highlights, headings, contentHtml } = parsed;
-    
-//     let html = '';
-    
-//     if (highlights.length > 0) {
-//       html += '<div class="post-highlights">';
-//       html += '<div class="highlights-title">✨ КЛЮЧЕВЫЕ ТЕЗИСЫ</div>';
-//       html += '<div class="highlights-list">';
-//       highlights.forEach(h => {
-//         html += `<div class="highlight-item"><span class="highlight-marker">✦</span><span class="highlight-text">${h}</span></div>`;
-//       });
-//       html += '</div></div>';
-//     }
-    
-//     if (headings.length > 0) {
-//       html += '<div class="post-toc">';
-//       html += '<div class="toc-title">📖 СОДЕРЖАНИЕ</div>';
-//       html += '<div class="toc-list">';
-//       headings.forEach(h => {
-//         html += `<a href="#${h.id}" class="toc-item">▹ ${h.text}</a>`;
-//       });
-//       html += '</div></div>';
-//     }
-    
-//     html += `<div class="post-content">${this.addHeadingAnchors(contentHtml, headings)}</div>`;
-    
-//     return html;
-//   }
-
-//   addHeadingAnchors(html, headings) {
-//     let result = html;
-//     headings.forEach(heading => {
-//       const regex = new RegExp(`<h2>${this.escapeRegex(heading.text)}</h2>`, 'i');
-//       result = result.replace(regex, `<h2 id="${heading.id}">${heading.text}</h2>`);
-//     });
-//     return result;
-//   }
-
-//   slugify(text) {
-//     return text.toLowerCase().replace(/[^a-zа-яё0-9\s]/g, '').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
-//   }
-
-//   escapeRegex(str) {
-//     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-//   }
-// }
-
-// const galaEngine = new GalaEngine();
-// export default galaEngine;
