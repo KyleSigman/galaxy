@@ -1,75 +1,98 @@
 import React, { useState, useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
 import StarField from './StarField';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../pages/GalacticMarket.scss";
 
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, query, onSnapshot, orderBy } from "firebase/firestore";
-
-// Firebase конфиг для маркета
-const firebaseConfig = {
-  apiKey: "AIzaSyD7XJDjsL698FfD7QUMGOaxm77Q6xxxxxx",
-  authDomain: "creator-75dac.firebaseapp.com",
-  databaseURL: "https://creator-75dac-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "creator-75dac",
-  storageBucket: "creator-75dac.firebasestorage.app",
-  messagingSenderId: "86422721022",
-  appId: "1:86422721022:web:ed2ae88a1bc1be46eff0af",
-  measurementId: "G-FN7KWCZX7X"
-};
-
-// Инициализация маркет Firebase
-const marketApp = initializeApp(firebaseConfig, "market");
-const marketDb = getFirestore(marketApp);
+import { db } from "../galaconfig";
+import { collection, addDoc, query, onSnapshot, orderBy, deleteDoc, doc } from "firebase/firestore";
 
 const GalacticMarket = () => {
-  const [user] = useAuthState(auth);
   const [products, setProducts] = useState([]);
+  const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     price: "",
-    category: "microphone",
+    category: "electronics",
     description: "",
     imageUrl: ""
   });
   const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
 
+  // 12 общих категорий
   const categories = [
-    { value: "microphone", label: "🎤 Микрофон", icon: "🎤" },
-    { value: "guitar", label: "🎸 Гитара", icon: "🎸" },
-    { value: "drums", label: "Ⓜ️ Барабаны", icon: "Ⓜ️" },
-    { value: "keys", label: "🎹 Клавиши", icon: "🎹" },
-    { value: "studio", label: "🎧 Студийное", icon: "🎧" },
-    { value: "other", label: "🔮 Другое", icon: "🔮" }
+    { value: "electronics", label: "📱 Электроника", icon: "📱" },
+    { value: "clothing", label: "👕 Одежда", icon: "👕" },
+    { value: "books", label: "📚 Книги", icon: "📚" },
+    { value: "games", label: "🎮 Игры", icon: "🎮" },
+    { value: "home", label: "🏠 Дом и сад", icon: "🏠" },
+    { value: "auto", label: "🚗 Автотовары", icon: "🚗" },
+    { value: "sports", label: "🏋️ Спорт", icon: "🏋️" },
+    { value: "art", label: "🎨 Искусство", icon: "🎨" },
+    { value: "tools", label: "🔧 Инструменты", icon: "🔧" },
+    { value: "kids", label: "🧸 Детям", icon: "🧸" },
+    { value: "pets", label: "🐶 Животные", icon: "🐶" },
+    { value: "other", label: "🎁 Другое", icon: "🎁" }
   ];
 
-  // Загрузка товаров
-  // useEffect(() => {
-  //   const q = query(collection(marketDb, "market"), orderBy("createdAt", "desc"));
-  //   const unsub = onSnapshot(q, (snapshot) => {
-  //     const productsData = snapshot.docs.map(doc => ({
-  //       id: doc.id,
-  //       ...doc.data()
-  //     }));
-  //     setProducts(productsData);
-  //   });
-  //   return () => unsub();
-  // }, []);
+  // Загрузка пользователя из localStorage
+  useEffect(() => {
+    const userKey = localStorage.getItem('userKey');
+    const userNick = localStorage.getItem('userNick');
+    
+    if (!userKey) {
+      navigate('/login');
+      return;
+    }
+
+    setUserData({
+      uid: userKey,
+      galaxyName: userNick || "Аноним",
+      avatar: null // можно будет подтянуть из Firestore при необходимости
+    });
+  }, [navigate]);
+
+  // Подписка на товары
+  useEffect(() => {
+    const q = query(
+      collection(db, "market"),
+      orderBy("createdAt", "desc")
+    );
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setProducts(items);
+    });
+    
+    return () => unsubscribe();
+  }, []);
 
   // Отправка формы
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user || !formData.imageUrl) return;
+    
+    if (!userData) {
+      alert("Авторизуйтесь для размещения товара");
+      navigate('/login');
+      return;
+    }
+    
+    if (!formData.imageUrl) {
+      alert("Добавьте ссылку на фото");
+      return;
+    }
 
     setUploading(true);
     try {
-      await addDoc(collection(marketDb, "market"), {
+      await addDoc(collection(db, "market"), {
         ...formData,
-        userId: user.uid,
-        userName: user.displayName || "Аноним",
-        userAvatar: user.photoURL || "",
+        price: Number(formData.price),
+        userId: userData.uid,
+        userName: userData.galaxyName,
+        userAvatar: userData.avatar || "",
         createdAt: new Date(),
         status: "active"
       });
@@ -77,24 +100,60 @@ const GalacticMarket = () => {
       setFormData({
         title: "",
         price: "",
-        category: "microphone",
+        category: "electronics",
         description: "",
         imageUrl: ""
       });
+      
+      alert("Товар успешно добавлен!");
     } catch (error) {
       console.error("Ошибка:", error);
+      alert("Ошибка при добавлении товара");
     } finally {
       setUploading(false);
     }
   };
 
+  // Удаление товара (только для своих)
+  const handleDelete = async (productId, userId) => {
+    if (!userData || userId !== userData.uid) {
+      alert("Вы можете удалять только свои товары");
+      return;
+    }
+    
+    if (window.confirm("Удалить товар?")) {
+      try {
+        await deleteDoc(doc(db, "market", productId));
+        alert("Товар удален");
+      } catch (error) {
+        console.error("Ошибка удаления:", error);
+      }
+    }
+  };
+
+  // Форматирование цены
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('ru-RU').format(price);
+  };
+
+  // Получить иконку категории
+  const getCategoryIcon = (categoryValue) => {
+    const cat = categories.find(c => c.value === categoryValue);
+    return cat ? cat.icon : "🎁";
+  };
+
   return (
     <div className="galactic-market">
-           <StarField />
+      <StarField />
       
       <div className="market-header">
         <h1>✦ GALACTIC MARKET ✦</h1>
-        <p>барахолка для музыкантов</p>
+        <p>межгалактическая барахолка</p>
+        {userData && (
+          <div className="user-badge">
+            👤 @{userData.galaxyName}
+          </div>
+        )}
       </div>
 
       <div className="market-container">
@@ -112,7 +171,7 @@ const GalacticMarket = () => {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="Neumann U87 AI"
+                placeholder="iPhone 15 Pro Max"
                 maxLength="50"
                 required
               />
@@ -120,7 +179,7 @@ const GalacticMarket = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label>ЦЕНА (⚡)</label>
+                <label>ЦЕНА (⭐)</label>
                 <input
                   type="number"
                   value={formData.price}
@@ -150,7 +209,7 @@ const GalacticMarket = () => {
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Магнитный кристалл с Марса, доставка варпом 3 дня..."
+                placeholder="Отличное состояние, торг уместен, доставка по галактике..."
                 rows="3"
                 required
               />
@@ -176,66 +235,93 @@ const GalacticMarket = () => {
                     alt="preview" 
                     onError={(e) => {
                       e.target.style.display = 'none';
-                      e.target.parentElement.innerHTML = '<span style="color:red">❌ неверная ссылка</span>';
+                      e.target.parentElement.innerHTML = '<span style="color:red;">❌ неверная ссылка</span>';
                     }}
                   />
                 </div>
                 <div className="preview-info">
                   <div className="preview-title">{formData.title || "Название"}</div>
-                  <div className="preview-price">{formData.price || "0"} ⚡</div>
+                  <div className="preview-price">{formData.price || "0"} ⭐</div>
                 </div>
               </div>
             )}
 
             <button type="submit" className="submit-btn" disabled={uploading}>
-              {uploading ? "⟳ ЗАГРУЗКА..." : "⟶ выставить"}
+              {uploading ? "⟳ ЗАГРУЗКА..." : "⟶ ВЫСТАВИТЬ"}
             </button>
           </form>
         </div>
 
         {/* Сетка товаров */}
-        {/* <div className="products-grid">
-          <h2>ТОВАРЫ В МАРКЕТЕ</h2>
-          <div className="products-list">
-            {products.map(product => (
-              <div key={product.id} className="product-card">
-                <div className="product-rarity">✦ {product.category.toUpperCase()}</div>
-                <div className="product-image">
-                  <img 
-                    src={product.imageUrl} 
-                    alt={product.title}
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/300x200?text=NO+IMAGE";
-                    }}
-                  />
-                </div>
-                <div className="product-content">
-                  <h3>{product.title}</h3>
-                  <p>{product.description}</p>
-                  <div className="product-meta">
-                    <span className="product-price">{product.price} ⚡</span>
-                    <span className="product-seller">
-                      <img 
-                        src={product.userAvatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} 
-                        alt="" 
-                        onError={(e) => {
-                          e.target.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-                        }}
-                      />
-                      {product.userName}
-                    </span>
+        <div className="products-grid">
+          <div className="products-header">
+            <h2>✦ ТОВАРЫ В МАРКЕТЕ ✦</h2>
+            <span className="products-count">{products.length} товаров</span>
+          </div>
+          
+          {products.length === 0 ? (
+            <div className="empty-products">
+              <p>✨ Здесь пока ничего нет ✨</p>
+              <p>Стань первым продавцом!</p>
+            </div>
+          ) : (
+            <div className="products-list">
+              {products.map(product => (
+                <div key={product.id} className="product-card">
+                  <div className="product-category">
+                    {getCategoryIcon(product.category)}
+                  </div>
+                  <div className="product-image">
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.title}
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/300x200?text=IMAGE+NOT+FOUND";
+                      }}
+                    />
+                  </div>
+                  <div className="product-content">
+                    <h3>{product.title}</h3>
+                    <p>{product.description.length > 100 
+                      ? product.description.slice(0, 100) + "..." 
+                      : product.description}</p>
+                    <div className="product-meta">
+                      <span className="product-price">{formatPrice(product.price)} ⭐</span>
+                      <span className="product-seller">
+                        {product.userAvatar ? (
+                          <img src={product.userAvatar} alt="" />
+                        ) : (
+                          <span className="seller-icon">👤</span>
+                        )}
+                        @{product.userName}
+                      </span>
+                    </div>
+                    
+                    {/* Кнопка удаления для своих товаров */}
+                    {userData && product.userId === userData.uid && (
+                      <button 
+                        className="delete-btn"
+                        onClick={() => handleDelete(product.id, product.userId)}
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div> */}
-
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <Link to="/" className="market-home">
-      🏠
-      </Link>
+      <div className="market-footer">
+        <Link to="/" className="market-home">
+          🏠
+        </Link>
+        <Link to="/profile" className="market-profile">
+          👤
+        </Link>
+      </div>
     </div>
   );
 };
