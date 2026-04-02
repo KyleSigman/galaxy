@@ -13,7 +13,7 @@
   background: $dark-bg;
 
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  font-weight: 100;
+  // font-weight: 100;
   padding: 20px; 
   padding-bottom: 80px; // Добавить отступ для нижней панели
   box-sizing: border-box;
@@ -621,10 +621,19 @@
 }
 
 .post-title {
-  color: $neon-blue;
-  font-size: 22px;
+  color: rgb(237, 244, 243);
+  text-shadow: 
+  0 0 1px #cae3ff,
+  0 0 5px #ffcb785d,
+  0 0 10px #8cc4ff84,
+  0 0 15px #8cc4ff46,
+  // 0 0 0 #ff00FF
+  // 
+  ;
+  // color: $neon-light;
+  font-size: 30px;
   font-family:'Times New Roman', Times, serif;
-  // font-weight: bold;
+  font-weight: bold;
   margin-bottom: 12px;
   // text-shadow: 0 0 5px $neon-blue;
 }
@@ -1318,8 +1327,8 @@
     
     .highlights-title {
       color: #ffffff;
-      font-size: 13px;
-      font-weight: normal;
+      // font-size: 13px;
+      // font-weight: normal;
       margin-bottom: 8px;
       // letter-spacing: 1px;
     }
@@ -1337,6 +1346,14 @@
         animation-delay: calc(var(--i) * 0.2s);
         white-space: normal; // разрешаем перенос строк
         word-break: break-word; // разрываем длинные слова
+
+                .highlight-text {
+          color: #000000;
+          font-size: 15px;
+          padding: 10px;
+          line-height: normal;
+        }
+    
       }
       
       @keyframes slideIn {
