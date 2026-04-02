@@ -28,21 +28,21 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
   // База команд
   const commands = {
 
-    '@@login': { path: '/login', desc: 'авторизоваться' },
+    '@@login': { path: '/login', desc: 'Войти' },
     '@@st': { path: '/startpage', desc: 'Стартовая страница' },
     '@@pf': { path: '/galaxy/', desc: 'Твой профиль' },
-    '@@art': { path: null, desc: '@@art abcdef — открыть визитку по ID' },
-    '@@find': { path: '/finder/', desc: 'Твой профиль' },
-    '@@cyberchat': { path: '/messenger', desc: 'Мессенджер' },
+    // '@@art': { path: null, desc: '@@art abcdef — открыть визитку по ID' },
+    // '@@find': { path: '/finder/', desc: 'Твой профиль' },
+    '@@cyber': { path: '/messenger', desc: 'чат' },
     '@@mk': { path: '/market', desc: 'продавать' },
-    '@@mkp': { path: '/marketplace', desc: 'Галактик маркет' },
-    '@@postvid': { path: null, desc: 'Опубликовать видео дня' },
-    '@@news': { path: '/news', desc: 'лента' },
-    '@@origin': { path: null, desc: '@@origin XK79P2 — открыть канал по ID' },
+    '@@mkp': { path: '/marketplace', desc: 'Маркет плейс' },
+    // '@@postvid': { path: null, desc: 'Опубликовать видео дня' },
+    // '@@news': { path: '/news', desc: 'лента' },
+    '@@origin': { path: null, desc: '@@origin 00ff00 — открыть по ID' },
     '@@origins': { path: '/origins', desc: 'каналы' },
-    '@@getnews': { path: null, desc: 'Показать свежие видео' },
+    // '@@getnews': { path: null, desc: 'Показать свежие видео' },
     '@@help': { path: null, desc: 'Показать все команды' },
-    '@@send': { path: null, desc: 'Отправить личное сообщение (пример: @@sendto KateDark привет)' },
+    '@@send': { path: null, desc: 'Сообщение (@@sendto KateDark привет)' },
     '@@clear': { path: 'clear', desc: 'Очистить историю' }
   };
 
@@ -150,14 +150,79 @@ const CommandTerminal = ({ currentUser, onModeChange }) => {
       const originId = cmd.replace('@@origin ', '').trim();
       navigate(`/origin/${originId}`);
     }
-    else if (cmd.startsWith('@@art ')) {
-      const artcardId = cmd.replace('@@art ', '').trim();
-      if (artcardId) {
-        navigate(`/artcard/${artcardId}`);
-      } else {
-        setMessage({ type: 'error', text: 'Укажи ID визитки: @@art abcdef' });
+
+    else if (cmd.startsWith('@@inv ')) {
+      const parts = cmd.replace('@@inv ', '').trim().split(' ');
+      const toNick = parts[0];
+      const roomIdParam = parts[1];
+      
+      if (!toNick) {
+        setMessage({ type: 'error', text: 'Формат: @@inv ник [roomId]' });
+        return;
+      }
+      
+      if (!roomIdParam) {
+        setMessage({ type: 'error', text: 'Укажи ID комнаты: @@inv ник ROOMID' });
+        return;
+      }
+      
+      try {
+        // Передаём roomIdParam как четвёртый параметр
+        await sendGalaxyMessage(toNick, `🔮 ПРИГЛАШЕНИЕ В ЧАТ\n\nID комнаты: ${roomIdParam}`, currentUser, roomIdParam);
+        setMessage({ type: 'success', text: `Приглашение отправлено ${toNick} в комнату ${roomIdParam}` });
+      } catch (error) {
+        setMessage({ type: 'error', text: error.message });
       }
     }
+
+    else if (cmd.startsWith('@@chat ')) {
+      const roomIdParam = cmd.replace('@@chat ', '').trim();
+      
+      if (!roomIdParam) {
+        setMessage({ type: 'error', text: 'Укажи ID комнаты: @@chat ROOMID' });
+        return;
+      }
+      
+      // Переход в мессенджер с заполненным ID
+      navigate(`/messenger?room=${roomIdParam}`);
+      setMessage({ type: 'success', text: `Переход в комнату ${roomIdParam}` });
+    }
+
+    // else if (cmd.startsWith('@@inv ')) {
+    //   const parts = cmd.replace('@@inv ', '').trim().split(' ');
+    //   const toNick = parts[0];
+    //   const roomIdParam = parts[1];
+      
+    //   if (!toNick) {
+    //     setMessage({ type: 'error', text: 'Формат: @@inv ник [roomId]' });
+    //     return;
+    //   }
+      
+    //   if (!roomIdParam) {
+    //     setMessage({ type: 'error', text: 'Укажи ID комнаты: @@inv ник ROOMID' });
+    //     return;
+    //   }
+      
+    //   try {
+    //     const inviteLink = `${window.location.origin}/messenger?room=${roomIdParam}`;
+    //     const messageText = `🔮 ПРИГЛАШЕНИЕ В ЧАТ\n\nID комнаты: ${roomIdParam}\nСсылка: ${inviteLink}\n\nНажми на ссылку или введи ID при входе.`;
+        
+    //     await sendGalaxyMessage(toNick, messageText, currentUser);
+    //     setMessage({ type: 'success', text: `Приглашение отправлено ${toNick} в комнату ${roomIdParam}` });
+    //   } catch (error) {
+    //     setMessage({ type: 'error', text: error.message });
+    //   }
+    // }
+
+    // else if (cmd.startsWith('@@art ')) {
+    //   const artcardId = cmd.replace('@@art ', '').trim();
+    //   if (artcardId) {
+    //     navigate(`/artcard/${artcardId}`);
+    //   } else {
+    //     setMessage({ type: 'error', text: 'Укажи ID визитки: @@art abcdef' });
+    //   }
+    // }
+
     else {
       setHistory(prev => [...prev, { 
         command: cmd, 
