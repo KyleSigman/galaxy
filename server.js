@@ -22,10 +22,11 @@ httpServer.listen(PORT, () => {
 // });
 // const server = new WebSocket.Server({ port: 8080 });
 
+
 const rooms = new Map(); // roomId -> { sockets, author, mode, allowedUsers }
 
 server.on('connection', (socket) => {
-  console.log('🟢 Новое подключение');
+  console.log('Новое подключение');
 
   socket.on('message', (data) => {
     const msg = JSON.parse(data);
@@ -116,6 +117,28 @@ server.on('connection', (socket) => {
         });
       }
     }
+
+    // Восстановление истории (только для автора)
+if (msg.type === 'restore_history' && socket.isAuthor) {
+  const room = rooms.get(socket.roomId);
+  
+  // Отправляем каждое сообщение всем
+  msg.messages.forEach(message => {
+    broadcast(socket.roomId, {
+      type: 'message',
+      nick: message.nick || '📜 ИСТОРИЯ',
+      message: message.message || message.text,
+      time: message.time || Date.now()
+    });
+  });
+  
+  // Системное уведомление
+  broadcast(socket.roomId, {
+    type: 'system',
+    message: `📜 ${socket.nick} восстановил историю чата (${msg.messages.length} сообщений)`
+  });
+}
+
   });
 
   socket.on('close', () => {
@@ -132,7 +155,7 @@ server.on('connection', (socket) => {
       // Если комната пуста - удаляем
       if (room.sockets.length === 0) {
         rooms.delete(socket.roomId);
-        console.log(`🗑️ Комната ${socket.roomId} удалена`);
+        console.log(`Комната ${socket.roomId} удалена`);
       }
     }
   });
@@ -147,4 +170,4 @@ function broadcast(roomId, data, excludeSocket = null) {
   });
 }
 
-console.log('🔵 WebSocket сервер на ws://localhost:8080');
+console.log('🔵 WebSocket is alive');
