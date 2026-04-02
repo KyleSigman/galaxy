@@ -25,6 +25,7 @@ const StartPage = () => {
             <span className="page">FIELD</span>
           </h1>
           <p className="subtitle">галактическая платформа</p>
+          <p className="vers">V1.0</p>
         </div>
 
         <div className="terminal-section">
@@ -48,32 +49,34 @@ const StartPage = () => {
             <h3>⚡ КОМАНДЫ ТЕРМИНАЛА ⚡</h3>
             <div className="command-list">
               <div className="command-item">
-                <span className="command"> @@start</span>
+                <span className="command"> @@login</span>
+                <span className="desc">войти</span>
+              </div>
+              <div className="command-item">
+                <span className="command"> @@origins</span>
+                <span className="desc">каналы</span>
+              </div>
+              <div className="command-item">
+                <span className="command"> @@st</span>
                 <span className="desc">главная</span>
               </div>
               <div className="command-item">
                 <span className="command"> @@pf</span>
                 <span className="desc">твой профиль</span>
               </div>
+
               <div className="command-item">
-                <span className="command"> @@news</span>
-                <span className="desc">лента новостей</span>
-              </div>
-              <div className="command-item">
-                <span className="command"> @@find</span>
-                <span className="desc">поиск музыкантов</span>
-              </div>
-              <div className="command-item">
-                <span className="command"> @@send</span>
+                <span className="command"> @@send </span>
                 <span className="desc">письмо</span>
               </div>
+
               <div className="command-item">
-                <span className="command"> @@login</span>
-                <span className="desc">войти</span>
+                <span className="command"> @@cyber</span>
+                <span className="desc">чат</span>
               </div>
               <div className="command-item">
                 <span className="command"> @@mkp</span>
-                <span className="desc">галактик маркет</span>
+                <span className="desc">маркет</span>
               </div>
               <div className="command-item">
                 <span className="command"> @@help</span>
